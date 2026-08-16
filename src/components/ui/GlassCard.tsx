@@ -18,23 +18,23 @@ export function GlassCard({
   glowColor = "none",
   ...props
 }: GlassCardProps) {
-  const glowStyles = {
-    none: "",
-    purple: "hover:border-purple-500/40 hover:shadow-[0_0_30px_rgba(124,58,237,0.2)]",
-    blue: "hover:border-blue-500/40 hover:shadow-[0_0_30px_rgba(59,130,246,0.2)]",
-    amber: "hover:border-amber-500/40 hover:shadow-[0_0_30px_rgba(245,158,11,0.2)]",
-    emerald: "hover:border-emerald-500/40 hover:shadow-[0_0_30px_rgba(16,185,129,0.2)]",
+  const colorShadows = {
+    none: "shadow-[2px_2px_0px_rgba(0,0,0,0.04)]",
+    purple: "shadow-[4px_4px_0px_rgba(233,213,255,0.7)] hover:border-purple-300",
+    blue: "shadow-[4px_4px_0px_rgba(219,234,254,0.7)] hover:border-blue-300",
+    amber: "shadow-[4px_4px_0px_rgba(254,215,170,0.7)] hover:border-amber-300",
+    emerald: "shadow-[4px_4px_0px_rgba(187,247,208,0.7)] hover:border-emerald-300",
   };
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 15 }}
+      initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+      transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
       className={cn(
-        "rounded-2xl relative overflow-hidden transition-all duration-300",
-        interactive ? "glass-panel-interactive cursor-pointer" : "glass-panel",
-        glowStyles[glowColor],
+        "rounded-2xl relative overflow-hidden bg-white border border-neutral-200 transition-all duration-200 text-neutral-900",
+        interactive && "cursor-pointer hover:-translate-y-1 hover:border-neutral-300",
+        colorShadows[glowColor],
         className
       )}
       {...props}

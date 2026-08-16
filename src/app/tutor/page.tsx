@@ -2,8 +2,8 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import ReactMarkdown from "react-markdown";
-import { Send, Sparkles, Bot, User, RefreshCw, Trash2, ArrowDown, BookOpen } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { Send, Sparkles, Bot, User, Trash2 } from "lucide-react";
+import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 interface Message {
@@ -122,25 +122,26 @@ export default function TutorPage() {
   };
 
   return (
-    <div className="min-h-[calc(100vh-140px)] bg-black text-zinc-100 flex flex-col justify-between items-center py-4 px-4">
+    <div className="min-h-[calc(100vh-140px)] bg-[#FAFAFA] text-neutral-900 flex flex-col justify-between items-center py-4 px-4 font-sans">
+      
       {/* Centered Document-Style Container (max-w-3xl) */}
       <div className="w-full max-w-3xl flex-1 flex flex-col justify-between">
         
         {/* Top Header Bar */}
-        <div className="flex items-center justify-between py-3 px-4 border-b border-white/10 mb-4 bg-zinc-950/60 backdrop-blur-xl rounded-2xl">
+        <div className="flex items-center justify-between py-3 px-4 border border-neutral-200 mb-4 bg-white/90 backdrop-blur-md rounded-2xl shadow-[0_2px_10px_rgba(0,0,0,0.03)]">
           <div className="flex items-center gap-2.5">
-            <div className="w-7 h-7 rounded-full bg-purple-600/30 border border-purple-500/40 flex items-center justify-center text-purple-300 shadow-[0_0_12px_rgba(124,58,237,0.4)]">
-              <Sparkles className="w-4 h-4" />
+            <div className="w-7 h-7 rounded-lg bg-black flex items-center justify-center text-white font-bold text-xs shadow-xs">
+              <Bot className="w-4 h-4" />
             </div>
             <div>
-              <span className="text-sm font-bold text-white tracking-tight">NOVA Socratic AI</span>
-              <span className="text-[10px] text-zinc-400 block font-mono">Real-time Stream • Gemini Flash</span>
+              <span className="text-sm font-bold text-neutral-950 tracking-tight">NOVA Socratic AI</span>
+              <span className="text-[10px] text-neutral-500 block font-mono">Real-time Stream • Gemini 2.5 Flash</span>
             </div>
           </div>
 
           <button
             onClick={clearChat}
-            className="p-1.5 rounded-lg bg-white/5 border border-white/10 text-zinc-400 hover:text-red-400 hover:bg-red-500/10 transition-colors text-xs flex items-center gap-1.5"
+            className="p-1.5 rounded-lg bg-neutral-100 border border-neutral-200 text-neutral-600 hover:text-red-600 hover:bg-red-50 transition-colors text-xs flex items-center gap-1.5 font-medium"
             title="Reset Chat"
           >
             <Trash2 className="w-3.5 h-3.5" />
@@ -162,33 +163,33 @@ export default function TutorPage() {
                 className={cn("flex flex-col gap-1.5 max-w-full", isUser ? "items-end" : "items-start")}
               >
                 {/* Role badge */}
-                <div className="flex items-center gap-1.5 text-[11px] font-semibold text-zinc-500 px-1">
+                <div className="flex items-center gap-1.5 text-[11px] font-bold text-neutral-400 px-1 font-mono">
                   {isUser ? (
                     <>
                       <span>You</span>
-                      <User className="w-3 h-3 text-purple-400" />
+                      <User className="w-3 h-3 text-neutral-700" />
                     </>
                   ) : (
                     <>
-                      <Bot className="w-3 h-3 text-purple-400" />
+                      <Bot className="w-3 h-3 text-purple-700" />
                       <span>NOVA Tutor</span>
                     </>
                   )}
                 </div>
 
-                {/* Bubble Container */}
+                {/* Bubble Container: User (solid dark charcoal bg-neutral-900 text-white) vs AI (clean white bg-white border border-neutral-200 text-neutral-800) */}
                 <div
                   className={cn(
-                    "text-sm leading-relaxed max-w-[88%] sm:max-w-[80%]",
+                    "text-sm leading-relaxed max-w-[88%] sm:max-w-[82%]",
                     isUser
-                      ? "p-4 rounded-2xl rounded-tr-none border border-white/10 bg-white/[0.04] text-white shadow-md"
-                      : "bg-transparent text-neutral-300 py-2 px-1"
+                      ? "p-4 rounded-2xl rounded-tr-none bg-neutral-900 text-white shadow-sm border border-neutral-800"
+                      : "p-4 rounded-2xl rounded-tl-none bg-white border border-neutral-200 text-neutral-800 shadow-[2px_2px_0px_rgba(0,0,0,0.04)]"
                   )}
                 >
                   {isUser ? (
-                    <p className="whitespace-pre-wrap">{msg.content}</p>
+                    <p className="whitespace-pre-wrap font-medium">{msg.content}</p>
                   ) : (
-                    <div className="prose prose-invert prose-purple max-w-none text-neutral-300 text-sm leading-relaxed space-y-3">
+                    <div className="prose prose-neutral max-w-none text-neutral-800 text-sm leading-relaxed space-y-3">
                       <ReactMarkdown>{msg.content}</ReactMarkdown>
                     </div>
                   )}
@@ -199,8 +200,8 @@ export default function TutorPage() {
 
           {/* Streaming Indicator */}
           {isLoading && (
-            <div className="flex items-center gap-2 text-xs text-purple-400 font-mono py-2 px-1">
-              <Sparkles className="w-3.5 h-3.5 animate-spin text-purple-400" />
+            <div className="flex items-center gap-2 text-xs text-purple-700 font-mono font-bold py-2 px-1">
+              <Sparkles className="w-3.5 h-3.5 animate-spin text-purple-600" />
               <span>NOVA is streaming Socratic guidance...</span>
             </div>
           )}
@@ -208,17 +209,17 @@ export default function TutorPage() {
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Quick Action Chips & Floating Input Command Bar */}
-        <div className="sticky bottom-4 pt-4 bg-gradient-to-t from-black via-black/90 to-transparent space-y-3">
+        {/* Quick Action Chips & Floating Command Bar Input */}
+        <div className="sticky bottom-4 pt-4 bg-gradient-to-t from-[#FAFAFA] via-[#FAFAFA]/90 to-transparent space-y-3">
           
-          {/* Quick Action Chips Horizontal Row */}
+          {/* Quick Action Chips Row */}
           <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
             {QUICK_CHIPS.map((chip) => (
               <button
                 key={chip.id}
                 disabled={isLoading}
                 onClick={() => handleSubmit(chip.prompt)}
-                className="shrink-0 bg-white/5 backdrop-blur-md border border-white/10 hover:border-purple-500/40 hover:bg-white/10 rounded-full text-xs px-3.5 py-1.5 text-zinc-300 hover:text-white transition-all duration-200 shadow-sm"
+                className="shrink-0 bg-white border border-neutral-200 hover:border-neutral-400 hover:bg-neutral-50 rounded-full text-xs font-semibold px-3.5 py-1.5 text-neutral-700 hover:text-neutral-950 transition-all duration-200 shadow-2xs"
               >
                 {chip.label}
               </button>
@@ -226,7 +227,7 @@ export default function TutorPage() {
           </div>
 
           {/* Floating Command Bar Input Area */}
-          <div className="relative flex items-center p-2 rounded-2xl bg-zinc-950/90 border border-white/10 shadow-[0_0_40px_rgba(124,58,237,0.15)] focus-within:border-purple-500/50 focus-within:shadow-[0_0_50px_rgba(124,58,237,0.25)] transition-all">
+          <div className="relative flex items-center p-2 rounded-2xl bg-white border border-neutral-200/90 shadow-[0_8px_30px_rgba(0,0,0,0.06),2px_2px_0px_rgba(0,0,0,0.03)] focus-within:border-neutral-400 transition-all">
             <textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
@@ -234,7 +235,7 @@ export default function TutorPage() {
               placeholder="Ask NOVA a question... (Press Enter to send)"
               rows={1}
               disabled={isLoading}
-              className="w-full bg-transparent text-sm text-white placeholder-zinc-500 px-3 py-2 focus:outline-none resize-none max-h-32 min-h-[40px]"
+              className="w-full bg-transparent text-sm text-neutral-900 placeholder-neutral-400 px-3 py-2 focus:outline-none resize-none max-h-32 min-h-[40px] font-medium"
             />
 
             <button
@@ -243,8 +244,8 @@ export default function TutorPage() {
               className={cn(
                 "p-2.5 rounded-xl transition-all shrink-0 flex items-center justify-center ml-1",
                 input.trim() && !isLoading
-                  ? "bg-purple-600 text-white shadow-[0_0_15px_rgba(124,58,237,0.5)] hover:bg-purple-500 scale-105"
-                  : "bg-white/5 text-zinc-600 cursor-not-allowed"
+                  ? "bg-black text-white shadow-sm hover:bg-neutral-800 scale-105"
+                  : "bg-neutral-100 text-neutral-400 cursor-not-allowed"
               )}
             >
               <Send className="w-4 h-4" />
