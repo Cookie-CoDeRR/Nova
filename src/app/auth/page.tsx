@@ -7,6 +7,7 @@ import { auth, googleProvider } from "@/lib/firebase";
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import { Sparkles, ArrowRight, Lock, Mail, Check, LogIn, UserPlus } from "lucide-react";
 import { GlobalNotebookBg } from "@/components/ui/GlobalNotebookBg";
+import { getStudentProfile } from "@/lib/userProfile";
 import { cn } from "@/lib/utils";
 
 export default function AuthPage() {
@@ -16,6 +17,15 @@ export default function AuthPage() {
   const [rememberMe, setRememberMe] = useState(true);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+
+  const checkRedirect = async () => {
+    const profile = await getStudentProfile();
+    if (profile.onboarded) {
+      window.location.href = "/dashboard";
+    } else {
+      window.location.href = "/onboarding";
+    }
+  };
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,15 +38,13 @@ export default function AuthPage() {
       if (tab === "LOGIN") {
         await signInWithEmailAndPassword(auth, email, password);
         setMessage({ type: "success", text: "Successfully authenticated with Firebase! Redirecting..." });
-        setTimeout(() => {
-          window.location.href = "/dashboard";
-        }, 1000);
+        setTimeout(checkRedirect, 800);
       } else {
         await createUserWithEmailAndPassword(auth, email, password);
-        setMessage({ type: "success", text: "Firebase Account created! Welcome to NOVA Sanctuary." });
+        setMessage({ type: "success", text: "Account created! Redirecting to Student Onboarding Wizard..." });
         setTimeout(() => {
-          window.location.href = "/dashboard";
-        }, 1000);
+          window.location.href = "/onboarding";
+        }, 800);
       }
     } catch (err: any) {
       console.error("Firebase auth error:", err);
@@ -57,10 +65,8 @@ export default function AuthPage() {
     setMessage(null);
     try {
       await signInWithPopup(auth, googleProvider);
-      setMessage({ type: "success", text: "Google Authentication successful! Redirecting..." });
-      setTimeout(() => {
-        window.location.href = "/dashboard";
-      }, 1000);
+      setMessage({ type: "success", text: "Google Authentication successful! Redirecting to Onboarding..." });
+      setTimeout(checkRedirect, 800);
     } catch (err: any) {
       console.error("Firebase Google Auth error:", err);
       setMessage({ type: "error", text: err.message || "Google sign in was cancelled or failed." });

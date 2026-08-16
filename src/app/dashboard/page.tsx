@@ -1,19 +1,27 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { generateMockHeatmapData, MOCK_SUBJECT_BREAKDOWN, MOCK_MILESTONE_PROGRESS, MOCK_ANALYTICS_SUMMARY, HeatmapDay } from "@/lib/mockData";
 import { generateWeeklyReportAction } from "@/app/actions/generate-weekly-report";
+import { getStudentProfile, StudentProfile, DEFAULT_PROFILE } from "@/lib/userProfile";
+import { EditProfileModal } from "@/components/dashboard/EditProfileModal";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
-import { Flame, Clock, Target, Sparkles, TrendingUp, CheckCircle2, ChevronRight, BarChart2 } from "lucide-react";
+import { Flame, Clock, Target, Sparkles, TrendingUp, CheckCircle2, ChevronRight, BarChart2, GraduationCap, Settings, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import ReactMarkdown from "react-markdown";
 
 export default function StudyPulseDashboardPage() {
+  const [profile, setProfile] = useState<StudentProfile>(DEFAULT_PROFILE);
   const [heatmapData] = useState<HeatmapDay[]>(generateMockHeatmapData());
   const [hoveredDay, setHoveredDay] = useState<HeatmapDay | null>(null);
   const [weeklyReport, setWeeklyReport] = useState<string | null>(null);
   const [isReportLoading, setIsReportLoading] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+  useEffect(() => {
+    getStudentProfile().then((p) => setProfile(p));
+  }, []);
 
   const handleGenerateReport = async () => {
     setIsReportLoading(true);
@@ -48,42 +56,66 @@ export default function StudyPulseDashboardPage() {
     <div className="w-full max-w-7xl mx-auto space-y-8 font-sans text-gray-800 pb-16">
       
       {/* Header Banner */}
-      <div className="bg-white border border-gray-200 rounded-2xl p-6 sm:p-8 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6">
-        <div className="space-y-1">
+      <div className="bg-white border border-gray-200 rounded-3xl p-6 sm:p-8 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6 relative overflow-hidden">
+        <div className="space-y-1.5">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-50 text-purple-900 border border-purple-200 text-xs font-bold font-mono">
             <BarChart2 className="w-3.5 h-3.5 text-purple-700" />
-            ACADEMIC COMMAND CENTER
+            ACADEMIC COMMAND CENTER • {profile.university}
           </div>
+          
           <h1 className="font-serif text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight">
-            Study Pulse Dashboard
+            {profile.displayName}'s Study Pulse
           </h1>
-          <p className="text-xs sm:text-sm text-gray-600">
-            Real-time visual tracking of your focus hours, subject mastery, and syllabus milestones.
+
+          <p className="text-xs sm:text-sm text-gray-600 flex items-center gap-2 flex-wrap">
+            <span className="font-medium">{profile.currentYear}</span>
+            <span>•</span>
+            <span className="font-mono text-gray-700">ID: {profile.rollNumber}</span>
           </p>
+
+          {/* Student Specialization Chips */}
+          <div className="flex items-center gap-1.5 pt-2 flex-wrap">
+            <span className="text-[10px] font-mono font-bold text-gray-400 uppercase">Specializations:</span>
+            {profile.specializations.map((spec, idx) => (
+              <span key={idx} className="text-[10px] font-semibold bg-gray-100 border border-gray-200 text-gray-800 px-2.5 py-0.5 rounded-full">
+                {spec}
+              </span>
+            ))}
+          </div>
         </div>
 
-        <button
-          onClick={handleGenerateReport}
-          disabled={isReportLoading}
-          className={cn(
-            "px-6 py-3.5 rounded-full font-bold text-xs shadow-xs flex items-center justify-center gap-2 transition-all duration-200 shrink-0 border",
-            isReportLoading
-              ? "bg-gray-100 text-gray-400 border-gray-200 cursor-wait"
-              : "bg-gray-900 text-white hover:bg-gray-800 border-gray-900 active:scale-[0.98]"
-          )}
-        >
-          {isReportLoading ? (
-            <>
-              <Sparkles className="w-4 h-4 animate-spin text-amber-400" />
-              Generating Weekly AI Digest...
-            </>
-          ) : (
-            <>
-              <Sparkles className="w-4 h-4 text-amber-400" />
-              Generate Weekly AI Report
-            </>
-          )}
-        </button>
+        <div className="flex items-center gap-3 shrink-0">
+          <button
+            onClick={() => setIsEditModalOpen(true)}
+            className="px-4 py-3 rounded-full font-bold text-xs bg-gray-100 border border-gray-200 text-gray-700 hover:bg-gray-200 transition-all flex items-center gap-1.5"
+          >
+            <Settings className="w-4 h-4" />
+            <span>Edit Profile</span>
+          </button>
+
+          <button
+            onClick={handleGenerateReport}
+            disabled={isReportLoading}
+            className={cn(
+              "px-6 py-3.5 rounded-full font-bold text-xs shadow-xs flex items-center justify-center gap-2 transition-all duration-200 border cursor-pointer",
+              isReportLoading
+                ? "bg-gray-100 text-gray-400 border-gray-200 cursor-wait"
+                : "bg-gray-900 text-white hover:bg-gray-800 border-gray-900 active:scale-[0.98]"
+            )}
+          >
+            {isReportLoading ? (
+              <>
+                <Sparkles className="w-4 h-4 animate-spin text-amber-400" />
+                Generating Weekly Digest...
+              </>
+            ) : (
+              <>
+                <Sparkles className="w-4 h-4 text-amber-400" />
+                Generate Weekly AI Report
+              </>
+            )}
+          </button>
+        </div>
       </div>
 
       {/* AI Weekly Report Drawer Display */}
@@ -95,7 +127,7 @@ export default function StudyPulseDashboardPage() {
             exit={{ opacity: 0, height: 0 }}
             className="overflow-hidden"
           >
-            <div className="bg-purple-50/90 border border-purple-200 rounded-2xl p-6 sm:p-8 shadow-sm relative">
+            <div className="bg-purple-50/90 border border-purple-200 rounded-3xl p-6 sm:p-8 shadow-sm relative">
               <button
                 onClick={() => setWeeklyReport(null)}
                 className="absolute top-4 right-4 text-xs font-bold text-purple-800 hover:underline"
@@ -113,7 +145,7 @@ export default function StudyPulseDashboardPage() {
       {/* Key Metric Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Total Focus Hours */}
-        <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm flex flex-col justify-between hover:shadow-md transition-all duration-300">
+        <div className="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm flex flex-col justify-between hover:shadow-md transition-all duration-300">
           <div className="flex items-center justify-between text-purple-800">
             <Clock className="w-5 h-5" />
             <span className="text-[10px] font-bold font-mono px-2 py-0.5 rounded bg-purple-50 border border-purple-200">
@@ -129,7 +161,7 @@ export default function StudyPulseDashboardPage() {
         </div>
 
         {/* Weekly Streak */}
-        <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm flex flex-col justify-between hover:shadow-md transition-all duration-300">
+        <div className="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm flex flex-col justify-between hover:shadow-md transition-all duration-300">
           <div className="flex items-center justify-between text-amber-800">
             <Flame className="w-5 h-5 fill-amber-500/20" />
             <span className="text-[10px] font-bold font-mono px-2 py-0.5 rounded bg-amber-50 border border-amber-200">
@@ -146,7 +178,7 @@ export default function StudyPulseDashboardPage() {
         </div>
 
         {/* Milestone Completion */}
-        <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm flex flex-col justify-between hover:shadow-md transition-all duration-300">
+        <div className="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm flex flex-col justify-between hover:shadow-md transition-all duration-300">
           <div className="flex items-center justify-between text-emerald-800">
             <Target className="w-5 h-5" />
             <span className="text-[10px] font-bold font-mono px-2 py-0.5 rounded bg-emerald-50 border border-emerald-200">
@@ -162,7 +194,7 @@ export default function StudyPulseDashboardPage() {
         </div>
 
         {/* Quiz Mastery */}
-        <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm flex flex-col justify-between hover:shadow-md transition-all duration-300">
+        <div className="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm flex flex-col justify-between hover:shadow-md transition-all duration-300">
           <div className="flex items-center justify-between text-blue-800">
             <TrendingUp className="w-5 h-5" />
             <span className="text-[10px] font-bold font-mono px-2 py-0.5 rounded bg-blue-50 border border-blue-200">
@@ -179,7 +211,7 @@ export default function StudyPulseDashboardPage() {
       </div>
 
       {/* 1. Productivity Heatmap Grid Card */}
-      <div className="bg-white border border-gray-200 rounded-2xl p-6 sm:p-8 shadow-sm space-y-4">
+      <div className="bg-white border border-gray-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-gray-100 pb-4">
           <div>
             <h2 className="font-serif text-xl font-bold text-gray-900 flex items-center gap-2">
@@ -233,8 +265,8 @@ export default function StudyPulseDashboardPage() {
       {/* 2. Focus Time Breakdown & Syllabus Milestones */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         
-        {/* Recharts Donut Card with Light Neutral Grid Lines (stroke="#f3f4f6") */}
-        <div className="bg-white border border-gray-200 rounded-2xl p-6 sm:p-8 shadow-sm flex flex-col justify-between space-y-4">
+        {/* Recharts Donut Card */}
+        <div className="bg-white border border-gray-200 rounded-3xl p-6 sm:p-8 shadow-sm flex flex-col justify-between space-y-4">
           <div className="flex items-center justify-between border-b border-gray-100 pb-3">
             <div>
               <h2 className="font-serif text-xl font-bold text-gray-900 flex items-center gap-2">
@@ -288,7 +320,7 @@ export default function StudyPulseDashboardPage() {
         </div>
 
         {/* Milestone Progress Card */}
-        <div className="bg-white border border-gray-200 rounded-2xl p-6 sm:p-8 shadow-sm flex flex-col justify-between space-y-4">
+        <div className="bg-white border border-gray-200 rounded-3xl p-6 sm:p-8 shadow-sm flex flex-col justify-between space-y-4">
           <div className="flex items-center justify-between border-b border-gray-100 pb-3">
             <div>
               <h2 className="font-serif text-xl font-bold text-gray-900 flex items-center gap-2">
@@ -347,6 +379,14 @@ export default function StudyPulseDashboardPage() {
         </div>
 
       </div>
+
+      {/* Edit Profile Modal */}
+      <EditProfileModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        currentProfile={profile}
+        onProfileUpdated={(updated) => setProfile(updated)}
+      />
 
     </div>
   );

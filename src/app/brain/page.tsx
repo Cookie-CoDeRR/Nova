@@ -5,6 +5,8 @@ import { useForm } from "react-hook-form";
 import { motion, AnimatePresence } from "framer-motion";
 import { parseSyllabusAction, Milestone } from "@/app/actions/parse-syllabus";
 import { Sparkles, Brain, Play, Pause, RotateCcw, X, Target, CheckCircle2, BookOpen, Zap } from "lucide-react";
+import { NptelSyncCard } from "@/components/brain/NptelSyncCard";
+import { KnowledgeList } from "@/components/brain/KnowledgeList";
 import { cn } from "@/lib/utils";
 
 interface FormInputs {
@@ -157,6 +159,9 @@ export default function BrainPage() {
         </div>
       </div>
 
+      {/* Indian Engineering NPTEL Video Integration Card */}
+      <NptelSyncCard />
+
       {/* Main Grid: Left Input Zone & Right Roadmap Timeline */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         
@@ -302,6 +307,9 @@ export default function BrainPage() {
         </div>
 
       </div>
+
+      {/* Notes & Syllabus Catalog List */}
+      <KnowledgeList />
 
       {/* Focus Mode Expansion Overlay (Pomodoro Timer) */}
       <AnimatePresence>
