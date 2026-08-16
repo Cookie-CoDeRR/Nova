@@ -13,11 +13,11 @@ const INITIAL_MESSAGES: ChatMessage[] = [
   {
     id: "m1",
     role: "assistant",
-    message: `Greetings, Alex! I am **NOVA**, your Socratic AI Companion. 🎓
- 
-I am here to help you master your courses (like **CS 301 Data Structures** or **PHYS 202 Quantum Mechanics**) by guiding you through concepts step-by-step rather than just giving away final answers.
- 
-Click any quick prompt above or ask me any question to begin!`,
+    message: `Greetings! I am **NOVA**, your Personal Socratic AI Companion. 🎓
+
+I am configured to guide you through complex engineering concepts, homework, and derivations. Instead of giving away direct answers, I will ask leading questions and break down principles step-by-step.
+
+How can I help you master your coursework today?`,
     timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
   },
 ];
@@ -49,7 +49,8 @@ export function ChatInterface() {
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     };
 
-    setMessages((prev) => [...prev, userMessage]);
+    const updatedMessages = [...messages, userMessage];
+    setMessages(updatedMessages);
     if (!textToSend) setInputPrompt("");
     setIsLoading(true);
 
@@ -63,7 +64,7 @@ export function ChatInterface() {
         body: JSON.stringify({
           prompt: query.trim(),
           courseContext: courseName,
-          history: messages.slice(-6).map((m) => ({ role: m.role, message: m.message })),
+          history: updatedMessages.slice(-10).map((m) => ({ role: m.role, message: m.message })),
         }),
       });
 
@@ -112,7 +113,7 @@ export function ChatInterface() {
             <div className="flex items-center gap-2">
               <h2 className="text-base font-bold text-gray-900 tracking-tight">Socratic AI Tutor</h2>
               <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-50 text-purple-900 border border-purple-200">
-                Gemini 1.5 Pro
+                Gemini 2.5 Flash
               </span>
             </div>
             <p className="text-xs text-gray-600">Guided step-by-step interactive learning</p>

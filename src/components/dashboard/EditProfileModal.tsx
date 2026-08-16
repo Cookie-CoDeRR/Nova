@@ -1,8 +1,9 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { X, User, GraduationCap, BookOpen, ShieldCheck, Zap, Save } from "lucide-react";
-import { StudentProfile, saveStudentProfile, DEFAULT_PROFILE } from "@/lib/userProfile";
+import { X, User, GraduationCap, BookOpen, ShieldCheck, Zap, Save, Layers } from "lucide-react";
+import { StudentProfile, saveStudentProfile } from "@/lib/userProfile";
+import { ENGINEERING_BRANCHES, ACADEMIC_YEARS } from "@/lib/constants";
 
 interface EditProfileModalProps {
   isOpen: boolean;
@@ -23,7 +24,8 @@ const SPECIALIZATION_OPTIONS = [
 export function EditProfileModal({ isOpen, onClose, currentProfile, onProfileUpdated }: EditProfileModalProps) {
   const [displayName, setDisplayName] = useState(currentProfile.displayName);
   const [university, setUniversity] = useState(currentProfile.university);
-  const [currentYear, setCurrentYear] = useState(currentProfile.currentYear);
+  const [branch, setBranch] = useState(ENGINEERING_BRANCHES[0]);
+  const [academicYear, setAcademicYear] = useState(ACADEMIC_YEARS[2]);
   const [rollNumber, setRollNumber] = useState(currentProfile.rollNumber);
   const [specializations, setSpecializations] = useState<string[]>(currentProfile.specializations);
   const [primaryGoal, setPrimaryGoal] = useState(currentProfile.primaryGoal);
@@ -32,7 +34,6 @@ export function EditProfileModal({ isOpen, onClose, currentProfile, onProfileUpd
   useEffect(() => {
     setDisplayName(currentProfile.displayName);
     setUniversity(currentProfile.university);
-    setCurrentYear(currentProfile.currentYear);
     setRollNumber(currentProfile.rollNumber);
     setSpecializations(currentProfile.specializations);
     setPrimaryGoal(currentProfile.primaryGoal);
@@ -54,11 +55,13 @@ export function EditProfileModal({ isOpen, onClose, currentProfile, onProfileUpd
     e.preventDefault();
     setLoading(true);
 
+    const yearMajorString = `${academicYear} • ${branch}`;
+
     try {
       const updated = await saveStudentProfile({
         displayName,
         university,
-        currentYear,
+        currentYear: yearMajorString,
         rollNumber,
         specializations,
         primaryGoal,
@@ -75,7 +78,7 @@ export function EditProfileModal({ isOpen, onClose, currentProfile, onProfileUpd
 
   return (
     <div className="fixed inset-0 z-50 bg-gray-900/40 backdrop-blur-xs flex items-center justify-center p-4">
-      <div className="w-full max-w-xl bg-white border border-gray-200 rounded-3xl p-6 sm:p-8 shadow-xl font-sans text-gray-800 relative">
+      <div className="w-full max-w-xl bg-white border border-gray-200 rounded-3xl p-6 sm:p-8 shadow-xl font-sans text-gray-800 relative max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between border-b border-gray-100 pb-4 mb-4">
           <div className="flex items-center gap-3">
             <div className="p-2.5 rounded-xl bg-purple-50 border border-purple-200 text-purple-800">
@@ -83,7 +86,7 @@ export function EditProfileModal({ isOpen, onClose, currentProfile, onProfileUpd
             </div>
             <div>
               <h2 className="text-base font-bold text-gray-900 tracking-tight">Edit Academic Student Profile</h2>
-              <p className="text-xs text-gray-500">Update university, major, roll number & core specializations</p>
+              <p className="text-xs text-gray-500">Update university, engineering branch, roll number & specializations</p>
             </div>
           </div>
 
@@ -118,16 +121,37 @@ export function EditProfileModal({ isOpen, onClose, currentProfile, onProfileUpd
             />
           </div>
 
+          <div>
+            <label className="text-xs font-bold text-gray-700 block mb-1 font-mono uppercase flex items-center gap-1.5">
+              <Layers className="w-3.5 h-3.5 text-purple-700" /> Engineering Branch / Major
+            </label>
+            <select
+              value={branch}
+              onChange={(e) => setBranch(e.target.value)}
+              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2 text-xs font-medium text-gray-900 focus:outline-none focus:border-gray-400"
+            >
+              {ENGINEERING_BRANCHES.map((b, idx) => (
+                <option key={idx} value={b}>
+                  {b}
+                </option>
+              ))}
+            </select>
+          </div>
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="text-xs font-bold text-gray-700 block mb-1 font-mono uppercase">Year & Major</label>
-              <input
-                type="text"
-                required
-                value={currentYear}
-                onChange={(e) => setCurrentYear(e.target.value)}
+              <label className="text-xs font-bold text-gray-700 block mb-1 font-mono uppercase">Academic Year</label>
+              <select
+                value={academicYear}
+                onChange={(e) => setAcademicYear(e.target.value)}
                 className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2 text-xs font-medium text-gray-900 focus:outline-none focus:border-gray-400"
-              />
+              >
+                {ACADEMIC_YEARS.map((y, idx) => (
+                  <option key={idx} value={y}>
+                    {y}
+                  </option>
+                ))}
+              </select>
             </div>
 
             <div>

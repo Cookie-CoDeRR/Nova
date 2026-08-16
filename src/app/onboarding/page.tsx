@@ -5,8 +5,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { GlobalNotebookBg } from "@/components/ui/GlobalNotebookBg";
 import { saveStudentProfile } from "@/lib/userProfile";
 import { auth } from "@/lib/firebase";
-import { Sparkles, GraduationCap, BookOpen, CheckCircle2, ArrowRight, ArrowLeft, ShieldCheck, Zap, User } from "lucide-react";
+import { Sparkles, GraduationCap, BookOpen, CheckCircle2, ArrowRight, ArrowLeft, ShieldCheck, Zap, User, Layers } from "lucide-react";
 import { NovaLogo } from "@/components/ui/NovaLogo";
+import { ENGINEERING_BRANCHES, ACADEMIC_YEARS } from "@/lib/constants";
 
 const SPECIALIZATION_OPTIONS = [
   { id: "fullstack", title: "Full-Stack Web Development", desc: "Next.js, React, Node.js, Cloud APIs" },
@@ -32,7 +33,9 @@ export default function OnboardingPage() {
   const [displayName, setDisplayName] = useState("");
   const [university, setUniversity] = useState(POPULAR_UNIVERSITIES[0]);
   const [customUniversity, setCustomUniversity] = useState("");
-  const [currentYear, setCurrentYear] = useState("3rd Year Computer Science & Engineering");
+  const [branch, setBranch] = useState(ENGINEERING_BRANCHES[0]);
+  const [customBranch, setCustomBranch] = useState("");
+  const [academicYear, setAcademicYear] = useState(ACADEMIC_YEARS[2]); // 3rd Year
   const [rollNumber, setRollNumber] = useState("2023CSB1042");
   
   const [selectedSpecs, setSelectedSpecs] = useState<string[]>([
@@ -67,12 +70,14 @@ export default function OnboardingPage() {
     setLoading(true);
 
     const finalUniversity = university === "Other" ? customUniversity || "University" : university;
+    const finalBranch = branch === "Other Engineering / Science Branch" ? customBranch || "Engineering" : branch;
+    const yearMajorString = `${academicYear} • ${finalBranch}`;
 
     try {
       await saveStudentProfile({
         displayName: displayName || "Alex Sharma",
         university: finalUniversity,
-        currentYear,
+        currentYear: yearMajorString,
         rollNumber,
         specializations: selectedSpecs,
         primaryGoal,
@@ -81,7 +86,6 @@ export default function OnboardingPage() {
     } catch (err) {
       console.error("Save profile error:", err);
     } finally {
-      // Guaranteed immediate redirect so user is never stuck
       window.location.href = "/dashboard";
     }
   };
@@ -100,7 +104,7 @@ export default function OnboardingPage() {
         </span>
       </div>
 
-      {/* Main Wizard Container (Responsive Mobile & Desktop) */}
+      {/* Main Wizard Container */}
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
@@ -120,7 +124,7 @@ export default function OnboardingPage() {
                   Step {step} of 2 • Setup Profile
                 </span>
                 <h1 className="text-lg sm:text-xl font-bold text-gray-900 tracking-tight font-serif mt-0.5">
-                  {step === 1 ? "Academic Details & College Setup" : "Specialization & Socratic Goals"}
+                  {step === 1 ? "Academic Details & Branch Selection" : "Specialization & Socratic Goals"}
                 </h1>
               </div>
             </div>
@@ -185,19 +189,51 @@ export default function OnboardingPage() {
                     )}
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <label className="text-xs font-bold text-gray-700 block mb-1 flex items-center gap-1.5 font-mono">
-                        <BookOpen className="w-3.5 h-3.5 text-purple-700" /> Academic Year & Major
-                      </label>
+                  {/* Branch / Major Dropdown */}
+                  <div>
+                    <label className="text-xs font-bold text-gray-700 block mb-1 flex items-center gap-1.5 font-mono">
+                      <Layers className="w-3.5 h-3.5 text-purple-700" /> Select Engineering Branch / Major
+                    </label>
+                    <select
+                      value={branch}
+                      onChange={(e) => setBranch(e.target.value)}
+                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2.5 text-xs text-gray-900 font-medium focus:outline-none focus:border-gray-400"
+                    >
+                      {ENGINEERING_BRANCHES.map((b, idx) => (
+                        <option key={idx} value={b}>
+                          {b}
+                        </option>
+                      ))}
+                    </select>
+
+                    {branch === "Other Engineering / Science Branch" && (
                       <input
                         type="text"
                         required
-                        value={currentYear}
-                        onChange={(e) => setCurrentYear(e.target.value)}
-                        placeholder="e.g. 3rd Year Computer Science"
-                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2.5 text-xs text-gray-900 font-medium focus:outline-none focus:border-gray-400"
+                        value={customBranch}
+                        onChange={(e) => setCustomBranch(e.target.value)}
+                        placeholder="Specify your engineering branch..."
+                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2.5 text-xs text-gray-900 font-medium focus:outline-none focus:border-gray-400 mt-2"
                       />
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-xs font-bold text-gray-700 block mb-1 flex items-center gap-1.5 font-mono">
+                        <BookOpen className="w-3.5 h-3.5 text-purple-700" /> Academic Year
+                      </label>
+                      <select
+                        value={academicYear}
+                        onChange={(e) => setAcademicYear(e.target.value)}
+                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2.5 text-xs text-gray-900 font-medium focus:outline-none focus:border-gray-400"
+                      >
+                        {ACADEMIC_YEARS.map((y, idx) => (
+                          <option key={idx} value={y}>
+                            {y}
+                          </option>
+                        ))}
+                      </select>
                     </div>
 
                     <div>
@@ -237,7 +273,7 @@ export default function OnboardingPage() {
                 >
                   <div>
                     <label className="text-xs font-bold text-gray-700 block mb-2 font-mono uppercase tracking-wider">
-                      Select Engineering Specializations (Pick 1 or more):
+                      Select Core Specializations (Pick 1 or more):
                     </label>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-64 sm:max-h-none overflow-y-auto pr-1">
                       {SPECIALIZATION_OPTIONS.map((spec) => {

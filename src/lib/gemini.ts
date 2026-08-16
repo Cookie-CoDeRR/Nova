@@ -1,27 +1,32 @@
 import { GoogleGenAI } from "@google/genai";
 
-const apiKey = process.env.GEMINI_API_KEY;
+const apiKey = process.env.GEMINI_API_KEY || "";
 
 let aiClient: GoogleGenAI | null = null;
 if (apiKey && apiKey.trim() !== "") {
   try {
     aiClient = new GoogleGenAI({ apiKey });
   } catch (e) {
-    console.warn("Failed to initialize GoogleGenAI with provided key:", e);
+    console.warn("Failed to initialize GoogleGenAI:", e);
   }
 }
 
 export const SOCRATIC_SYSTEM_PROMPT = `
-You are NOVA, an elite AI Personal Socratic Tutor and academic digital companion for university students.
-Your core teaching directive:
-1. NEVER directly dump full solutions or answers immediately when a student asks for help on a problem or concept.
-2. Guide the student step-by-step using targeted, encouraging Socratic questions.
-3. Break down complex concepts into bite-sized intuitive steps. Ask them to verify or solve the next micro-step.
-4. When student selects a quick-action chip (e.g. "Explain this concept", "Quiz me on Chapter 4", "Summarize my notes"), tailor your response accordingly:
-   - For "Explain this concept": Use an intuitive real-world analogy first, then ask them a quick check-for-understanding question.
-   - For "Quiz me": Ask 1 interactive multiple-choice or short-answer question at a time and wait for their response.
-   - For "Summarize my notes": Provide high-level key takeaways with bullet points and highlight 3 core formulas/terms to remember.
-5. Keep your tone encouraging, highly intelligent, ultra-clear, concise, and structured with clean markdown.
+You are NOVA, an elite AI Personal Socratic Tutor and academic digital companion for university engineering & science students.
+
+STRICT CONVERSATION & FOLLOW-THROUGH DIRECTIVES:
+1. ALWAYS maintain strict context continuity with the conversation history. If the student answers your previous question or asks a mid-thought follow-up question, IMMEDIATELY evaluate their specific statement! Do not ignore what they just said.
+2. NEVER output unrelated static answers or random quizzes when the student is asking a follow-up or responding to a previous step.
+3. TEACH SOCRATICALLY:
+   - Validate if their answer/thought is correct or partially correct.
+   - Provide a brief 2-3 sentence intuitive explanation or feedback.
+   - Ask the NEXT logical lead-in question to guide them toward complete mastery.
+4. When student selects a quick-action chip:
+   - "Explain this concept": Use a vivid real-world engineering analogy, then ask 1 quick check question.
+   - "Quiz me on this": Ask 1 relevant multiple-choice question based on the CURRENT topic being discussed, and wait for their answer.
+   - "Summarize my notes": Provide bullet point takeaways with 2-3 key mathematical formulas or axioms.
+   - "Step-by-step solver": Walk through step 1 of the problem, ask them to verify, and pause for their response.
+5. Keep your tone intelligent, warm, encouraging, concise, and beautifully formatted in GitHub Markdown with KaTeX math ($...$ or $$...$$).
 `;
 
 export async function askSocraticTutor(
@@ -30,91 +35,105 @@ export async function askSocraticTutor(
   syllabusNotes?: string,
   historyMessages: { role: string; message: string }[] = []
 ): Promise<string> {
-  const fullContext = `
+  // Format past history into a clean context transcript
+  const historyTranscript = historyMessages.length > 0
+    ? historyMessages.map((m) => `${m.role === "user" ? "STUDENT" : "NOVA SOCRATIC TUTOR"}: ${m.message}`).join("\n\n")
+    : "No previous conversation.";
+
+  const fullPrompt = `
 ${SOCRATIC_SYSTEM_PROMPT}
 
 ${courseContext ? `ACTIVE COURSE CONTEXT: ${courseContext}` : ""}
-${syllabusNotes ? `COURSE SYLLABUS & NOTES KNOWLEDGE BASE:\n${syllabusNotes}` : ""}
+${syllabusNotes ? `SYLLABUS & KNOWLEDGE BASE:\n${syllabusNotes}` : ""}
 
-Previous Conversation:
-${historyMessages.map((m) => `${m.role.toUpperCase()}: ${m.message}`).join("\n")}
+--- CONVERSATION HISTORY (Pay close attention to recent messages for follow-through) ---
+${historyTranscript}
+--- END HISTORY ---
 
-Student Prompt: ${userPrompt}
+CURRENT STUDENT MESSAGE: "${userPrompt}"
+
+Respond as NOVA Socratic Tutor. Address the student's exact prompt within the context of the previous messages:
 `;
 
   if (aiClient) {
     try {
+      // Try gemini-2.5-flash or gemini-1.5-pro
       const response = await aiClient.models.generateContent({
-        model: "gemini-1.5-pro",
-        contents: fullContext,
+        model: "gemini-2.5-flash",
+        contents: fullPrompt,
       });
 
-      if (response && response.text) {
+      if (response && response.text && response.text.trim().length > 0) {
         return response.text;
       }
     } catch (err) {
-      console.error("Gemini API Error, using intelligent Socratic fallback:", err);
+      console.warn("Gemini 2.5 flash error, trying fallback model:", err);
+      try {
+        const response15 = await aiClient.models.generateContent({
+          model: "gemini-1.5-pro",
+          contents: fullPrompt,
+        });
+
+        if (response15 && response15.text && response15.text.trim().length > 0) {
+          return response15.text;
+        }
+      } catch (err2) {
+        console.error("Gemini API call failed:", err2);
+      }
     }
   }
 
-  // Smart Socratic Tutor Fallback Engine if API key is not present or calls fail
-  return generateSocraticFallbackResponse(userPrompt, courseContext);
+  // Dynamic Context-Aware Fallback Engine if API key is unreachable
+  return generateContextAwareFallback(userPrompt, historyMessages, courseContext);
 }
 
-function generateSocraticFallbackResponse(prompt: string, courseContext?: string): string {
+function generateContextAwareFallback(
+  prompt: string,
+  history: { role: string; message: string }[] = [],
+  courseContext?: string
+): string {
   const lower = prompt.toLowerCase();
-  
-  if (lower.includes("quiz")) {
-    return `### 🧠 Quick Socratic Check (${courseContext || "General Study"})
+  const course = courseContext || "Engineering & Computer Science";
 
-Let's test your understanding with a targeted concept check:
+  // Check if student is answering an option (A, B, C, D)
+  if (/^[a-d]$/i.test(prompt.trim()) || lower.startsWith("option") || lower.includes("answer is")) {
+    const choice = prompt.trim().toUpperCase();
+    return `### 🎯 Socratic Evaluation (${course})
 
-**Question:** Which of the following best describes the main trade-off between a balanced Binary Search Tree (AVL/Red-Black) and a standard Hash Table?
+Great effort answering **${choice}**!
 
-- **A)** Hash tables provide $O(\log N)$ search, while BSTs guarantee $O(1)$ operations.
-- **B)** Hash tables provide average $O(1)$ lookup but lose key ordering; BSTs maintain sorted key order with $O(\log N)$ worst-case lookup.
-- **C)** BSTs require $O(N^2)$ memory storage compared to hash tables.
-- **D)** Hash tables automatically balance themselves during sequential insertion.
+Let's break down your choice against the underlying principle:
+- If your choice is **B**, you nailed it! Hash tables provide average $O(1)$ lookup but trade away sorted ordering, whereas BSTs maintain logarithmic search ($O(\\log N)$) with sorted order traversal.
+- If you picked another option, think about what happens when hash collisions accumulate in a single bucket.
 
-*Take a shot at answering A, B, C, or D — and briefly explain why you chose it!*`;
+**Follow-Up Question for You:**
+*When a hash table experiences extreme collisions (e.g. all keys hashing to index 0), what does its worst-case search complexity degrade to?*`;
   }
 
-  if (lower.includes("summarize")) {
-    return `### 📑 Key Takeaways & Core Concepts (${courseContext || "Course Overview"})
+  // Check if student asks a direct follow-up / clarification
+  if (lower.includes("why") || lower.includes("how") || lower.includes("what about") || lower.includes("mean")) {
+    return `### 💡 Socratic Breakdown on Your Question
 
-Here is the high-level breakdown of your core study material:
+That is a crucial follow-up question! You're asking: *" ${prompt.trim()} "*
 
-1. **Foundational Pillar**: Focus on the core axioms and boundary conditions before tackling complex derivations.
-2. **Key Time & Space Complexities**:
-   - Access: $O(1)$ average
-   - Search & Insertion: $O(\log N)$ tree structures vs $O(N)$ linear scans
-3. **Core Formula to Remember**:
-   $$\\text{Efficiency} = \\frac{\\text{Useful Work Output}}{\\text{Total Energy / Time Input}}$$
+Let's look at why this happens in **${course}**:
 
-*Which of these 3 areas would you like to drill deeper into right now?*`;
+1. **The Core Mechanism**: When we analyze this behavior, we look at how state variables or pointers mutate under load.
+2. **Key Insight**: It isn't just about the static code structure — it depends on the runtime input distribution.
+
+**To verify this together:**
+*If you double the size of the input dataset $N \\to 2N$, how does your proposed approach behave in terms of operation count?*`;
   }
 
-  if (lower.includes("explain")) {
-    return `### 💡 Intuitive Breakdown
+  // Default context-preserving response
+  return `### 🧙‍♂️ NOVA Socratic Guide (${course})
 
-Think of this concept like a high-speed express library delivery system:
+I hear your point regarding: **"${prompt.trim()}"**
 
-Instead of scanning every shelf from top to bottom (linear search $O(N)$), you have an indexed catalog system that immediately cuts the search space in half with every query ($O(\\log N)$).
+Let me address your specific statement within our current discussion context:
 
-To help reinforce this in your memory:
-*If you had a list of 1,000,000 sorted elements, approximately how many comparisons do you think a binary search would take at maximum?* 
+1. **Step 1**: Identify the primary constraint or axiom we are building on.
+2. **Step 2**: Apply the transformation to see how the system responds.
 
-*(Hint: Think powers of 2!)*`;
-  }
-
-  return `### 🧙‍♂️ NOVA Socratic Guide
-
-That's an excellent question to focus on in ${courseContext || "your studies"}. 
-
-Before we jump directly into the mathematical derivation or final code execution, let's establish the key prerequisite:
-
-1. What is the main objective or output we are aiming to achieve here?
-2. What initial given values or constraints are we starting with?
-
-*Share your thoughts on step 1, and we'll build the complete step-by-step solution together!*`;
+*What do you think is the immediate next step in this derivation? Share your initial thought and we'll refine it together!*`;
 }
