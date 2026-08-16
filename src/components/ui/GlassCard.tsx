@@ -18,12 +18,12 @@ export function GlassCard({
   glowColor = "none",
   ...props
 }: GlassCardProps) {
-  const colorShadows = {
-    none: "shadow-[2px_2px_0px_rgba(0,0,0,0.04)]",
-    purple: "shadow-[4px_4px_0px_rgba(233,213,255,0.7)] hover:border-purple-300",
-    blue: "shadow-[4px_4px_0px_rgba(219,234,254,0.7)] hover:border-blue-300",
-    amber: "shadow-[4px_4px_0px_rgba(254,215,170,0.7)] hover:border-amber-300",
-    emerald: "shadow-[4px_4px_0px_rgba(187,247,208,0.7)] hover:border-emerald-300",
+  const colorGlows = {
+    none: "border-neutral-800 hover:border-neutral-700",
+    purple: "border-purple-500/30 hover:border-purple-500/60 shadow-[0_0_25px_rgba(124,58,237,0.12)]",
+    blue: "border-blue-500/30 hover:border-blue-500/60 shadow-[0_0_25px_rgba(59,130,246,0.12)]",
+    amber: "border-amber-500/30 hover:border-amber-500/60 shadow-[0_0_25px_rgba(245,158,11,0.12)]",
+    emerald: "border-emerald-500/30 hover:border-emerald-500/60 shadow-[0_0_25px_rgba(16,185,129,0.12)]",
   };
 
   return (
@@ -32,9 +32,9 @@ export function GlassCard({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
       className={cn(
-        "rounded-2xl relative overflow-hidden bg-white border border-neutral-200 transition-all duration-200 text-neutral-900",
-        interactive && "cursor-pointer hover:-translate-y-1 hover:border-neutral-300",
-        colorShadows[glowColor],
+        "rounded-2xl relative overflow-hidden bg-[#0A0A0C] border transition-all duration-200 text-neutral-300",
+        interactive && "cursor-pointer hover:-translate-y-1",
+        colorGlows[glowColor],
         className
       )}
       {...props}

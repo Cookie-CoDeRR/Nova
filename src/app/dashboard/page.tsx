@@ -37,27 +37,27 @@ export default function StudyPulseDashboardPage() {
   };
 
   const levelColorMap = {
-    0: "bg-neutral-100 hover:bg-neutral-200 border-neutral-200",
-    1: "bg-purple-200 hover:bg-purple-300 border-purple-300",
-    2: "bg-purple-300 hover:bg-purple-400 border-purple-400",
-    3: "bg-purple-500 hover:bg-purple-600 border-purple-600",
-    4: "bg-purple-700 hover:bg-purple-800 border-purple-800",
+    0: "bg-neutral-900 hover:bg-neutral-800 border-neutral-800",
+    1: "bg-purple-950/70 hover:bg-purple-900 border-purple-800/60",
+    2: "bg-purple-800/60 hover:bg-purple-700 border-purple-600/60",
+    3: "bg-purple-600 hover:bg-purple-500 border-purple-400",
+    4: "bg-purple-500 hover:bg-purple-400 border-purple-300 shadow-[0_0_10px_rgba(168,85,247,0.5)]",
   };
 
   return (
-    <div className="w-full max-w-7xl mx-auto space-y-8 font-sans text-neutral-800 pb-16">
+    <div className="w-full max-w-7xl mx-auto space-y-8 font-sans text-neutral-300 pb-16">
       
-      {/* Header Banner matching Editorial Serif Landing Page DNA */}
-      <div className="bg-white border border-neutral-200/80 rounded-2xl p-6 sm:p-8 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6">
+      {/* Header Banner */}
+      <div className="bg-[#0A0A0C] border border-neutral-800 rounded-2xl p-6 sm:p-8 shadow-md flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="space-y-1">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-50 text-purple-900 border border-purple-200 text-xs font-bold font-mono">
-            <BarChart2 className="w-3.5 h-3.5 text-purple-700" />
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-500/10 text-purple-300 border border-purple-500/20 text-xs font-bold font-mono">
+            <BarChart2 className="w-3.5 h-3.5 text-purple-400" />
             ACADEMIC COMMAND CENTER
           </div>
-          <h1 className="font-serif text-3xl sm:text-4xl font-bold text-neutral-950 tracking-tight">
+          <h1 className="font-sans text-3xl sm:text-4xl font-bold text-white tracking-tight">
             Study Pulse Dashboard
           </h1>
-          <p className="text-xs sm:text-sm text-neutral-600">
+          <p className="text-xs sm:text-sm text-neutral-400">
             Real-time visual tracking of your focus hours, subject mastery, and syllabus milestones.
           </p>
         </div>
@@ -66,20 +66,20 @@ export default function StudyPulseDashboardPage() {
           onClick={handleGenerateReport}
           disabled={isReportLoading}
           className={cn(
-            "px-6 py-3.5 rounded-full font-bold text-xs shadow-sm flex items-center justify-center gap-2 transition-all duration-200 shrink-0 border",
+            "px-6 py-3.5 rounded-full font-bold text-xs shadow-md flex items-center justify-center gap-2 transition-all duration-200 shrink-0 border",
             isReportLoading
-              ? "bg-neutral-100 text-neutral-400 border-neutral-200 cursor-wait"
-              : "bg-neutral-950 text-white hover:bg-neutral-800 border-black active:scale-[0.98]"
+              ? "bg-neutral-900 text-neutral-500 border-neutral-800 cursor-wait"
+              : "bg-purple-600 text-white hover:bg-purple-500 border-purple-500 active:scale-[0.98] shadow-[0_0_20px_rgba(124,58,237,0.4)]"
           )}
         >
           {isReportLoading ? (
             <>
-              <Sparkles className="w-4 h-4 animate-spin text-amber-400" />
+              <Sparkles className="w-4 h-4 animate-spin text-amber-300" />
               Generating Weekly AI Digest...
             </>
           ) : (
             <>
-              <Sparkles className="w-4 h-4 text-amber-400" />
+              <Sparkles className="w-4 h-4 text-amber-300" />
               Generate Weekly AI Report
             </>
           )}
@@ -95,14 +95,14 @@ export default function StudyPulseDashboardPage() {
             exit={{ opacity: 0, height: 0 }}
             className="overflow-hidden"
           >
-            <div className="bg-purple-50/90 border border-purple-200 rounded-2xl p-6 sm:p-8 shadow-sm relative">
+            <div className="bg-[#0A0A0C] border border-purple-500/30 rounded-2xl p-6 sm:p-8 shadow-[0_0_30px_rgba(124,58,237,0.15)] relative">
               <button
                 onClick={() => setWeeklyReport(null)}
-                className="absolute top-4 right-4 text-xs font-bold text-purple-800 hover:underline"
+                className="absolute top-4 right-4 text-xs font-bold text-purple-400 hover:underline"
               >
                 Close Report ✕
               </button>
-              <div className="prose prose-purple max-w-none text-xs leading-relaxed text-neutral-800 space-y-2">
+              <div className="prose prose-invert max-w-none text-xs leading-relaxed text-neutral-300 space-y-2">
                 <ReactMarkdown>{weeklyReport}</ReactMarkdown>
               </div>
             </div>
@@ -110,93 +110,93 @@ export default function StudyPulseDashboardPage() {
         )}
       </AnimatePresence>
 
-      {/* Key Metric Cards matching Index Card Standard (bg-white border border-neutral-200/80 shadow-sm p-6) */}
+      {/* Key Metric Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Total Focus Hours */}
-        <div className="bg-white border border-neutral-200/80 rounded-2xl p-6 shadow-sm flex flex-col justify-between hover:shadow-md transition-all duration-300">
-          <div className="flex items-center justify-between text-purple-800">
+        <div className="bg-[#0A0A0C] border border-neutral-800 rounded-2xl p-6 shadow-md flex flex-col justify-between hover:border-purple-500/40 transition-all duration-300">
+          <div className="flex items-center justify-between text-purple-400">
             <Clock className="w-5 h-5" />
-            <span className="text-[10px] font-bold font-mono px-2 py-0.5 rounded bg-purple-50 border border-purple-200">
+            <span className="text-[10px] font-bold font-mono px-2 py-0.5 rounded bg-purple-500/10 border border-purple-500/20 text-purple-300">
               THIS WEEK
             </span>
           </div>
           <div className="mt-4">
-            <div className="text-3xl font-black font-mono text-neutral-950 tracking-tight">
+            <div className="text-3xl font-black font-mono text-white tracking-tight">
               {MOCK_ANALYTICS_SUMMARY.totalFocusHours}h
             </div>
-            <div className="text-xs text-neutral-600 font-medium mt-0.5">Total Focused Study</div>
+            <div className="text-xs text-neutral-400 font-medium mt-0.5">Total Focused Study</div>
           </div>
         </div>
 
         {/* Weekly Streak */}
-        <div className="bg-white border border-neutral-200/80 rounded-2xl p-6 shadow-sm flex flex-col justify-between hover:shadow-md transition-all duration-300">
-          <div className="flex items-center justify-between text-amber-800">
+        <div className="bg-[#0A0A0C] border border-neutral-800 rounded-2xl p-6 shadow-md flex flex-col justify-between hover:border-amber-500/40 transition-all duration-300">
+          <div className="flex items-center justify-between text-amber-400">
             <Flame className="w-5 h-5 fill-amber-500/20" />
-            <span className="text-[10px] font-bold font-mono px-2 py-0.5 rounded bg-amber-50 border border-amber-200">
+            <span className="text-[10px] font-bold font-mono px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/20 text-amber-300">
               ACTIVE
             </span>
           </div>
           <div className="mt-4">
-            <div className="text-3xl font-black font-mono text-neutral-950 tracking-tight flex items-center gap-1">
+            <div className="text-3xl font-black font-mono text-white tracking-tight flex items-center gap-1">
               <span>{MOCK_ANALYTICS_SUMMARY.weeklyStreak}</span>
               <span className="text-sm font-normal text-neutral-500">Days</span>
             </div>
-            <div className="text-xs text-neutral-600 font-medium mt-0.5">Consecutive Streak</div>
+            <div className="text-xs text-neutral-400 font-medium mt-0.5">Consecutive Streak</div>
           </div>
         </div>
 
         {/* Milestone Completion */}
-        <div className="bg-white border border-neutral-200/80 rounded-2xl p-6 shadow-sm flex flex-col justify-between hover:shadow-md transition-all duration-300">
-          <div className="flex items-center justify-between text-emerald-800">
+        <div className="bg-[#0A0A0C] border border-neutral-800 rounded-2xl p-6 shadow-md flex flex-col justify-between hover:border-emerald-500/40 transition-all duration-300">
+          <div className="flex items-center justify-between text-emerald-400">
             <Target className="w-5 h-5" />
-            <span className="text-[10px] font-bold font-mono px-2 py-0.5 rounded bg-emerald-50 border border-emerald-200">
+            <span className="text-[10px] font-bold font-mono px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20 text-emerald-300">
               75% DONE
             </span>
           </div>
           <div className="mt-4">
-            <div className="text-3xl font-black font-mono text-neutral-950 tracking-tight">
+            <div className="text-3xl font-black font-mono text-white tracking-tight">
               {MOCK_MILESTONE_PROGRESS.completed}/{MOCK_MILESTONE_PROGRESS.total}
             </div>
-            <div className="text-xs text-neutral-600 font-medium mt-0.5">Milestones Conquered</div>
+            <div className="text-xs text-neutral-400 font-medium mt-0.5">Milestones Conquered</div>
           </div>
         </div>
 
         {/* Quiz Mastery */}
-        <div className="bg-white border border-neutral-200/80 rounded-2xl p-6 shadow-sm flex flex-col justify-between hover:shadow-md transition-all duration-300">
-          <div className="flex items-center justify-between text-blue-800">
+        <div className="bg-[#0A0A0C] border border-neutral-800 rounded-2xl p-6 shadow-md flex flex-col justify-between hover:border-blue-500/40 transition-all duration-300">
+          <div className="flex items-center justify-between text-blue-400">
             <TrendingUp className="w-5 h-5" />
-            <span className="text-[10px] font-bold font-mono px-2 py-0.5 rounded bg-blue-50 border border-blue-200">
+            <span className="text-[10px] font-bold font-mono px-2 py-0.5 rounded bg-blue-500/10 border border-blue-500/20 text-blue-300">
               ACCURACY
             </span>
           </div>
           <div className="mt-4">
-            <div className="text-3xl font-black font-mono text-neutral-950 tracking-tight">
+            <div className="text-3xl font-black font-mono text-white tracking-tight">
               {MOCK_ANALYTICS_SUMMARY.avgAccuracy}%
             </div>
-            <div className="text-xs text-neutral-600 font-medium mt-0.5">Quiz Mastery Score</div>
+            <div className="text-xs text-neutral-400 font-medium mt-0.5">Quiz Mastery Score</div>
           </div>
         </div>
       </div>
 
       {/* 1. Productivity Heatmap Grid Card */}
-      <div className="bg-white border border-neutral-200/80 rounded-2xl p-6 sm:p-8 shadow-sm space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-neutral-100 pb-4">
+      <div className="bg-[#0A0A0C] border border-neutral-800 rounded-2xl p-6 sm:p-8 shadow-md space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-neutral-800/80 pb-4">
           <div>
-            <h2 className="font-serif text-xl font-bold text-neutral-950 flex items-center gap-2">
-              <Clock className="w-4 h-4 text-purple-700" />
+            <h2 className="font-sans text-xl font-bold text-white flex items-center gap-2">
+              <Clock className="w-4 h-4 text-purple-400" />
               12-Week Study Productivity Heatmap
             </h2>
-            <p className="text-xs text-neutral-500">Each cell represents daily focus timer & Socratic tutor activity</p>
+            <p className="text-xs text-neutral-400">Each cell represents daily focus timer & Socratic tutor activity</p>
           </div>
 
           {/* Tooltip display */}
-          <div className="text-xs font-mono bg-neutral-50 border border-neutral-200/80 rounded-lg px-3 py-1.5 text-neutral-700">
+          <div className="text-xs font-mono bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-1.5 text-neutral-300">
             {hoveredDay ? (
-              <span className="font-semibold text-purple-900">
+              <span className="font-semibold text-purple-300">
                 {hoveredDay.date}: <strong>{hoveredDay.summary}</strong>
               </span>
             ) : (
-              <span className="text-neutral-400">Hover over any square to view daily focus log</span>
+              <span className="text-neutral-500">Hover over any square to view daily focus log</span>
             )}
           </div>
         </div>
@@ -221,11 +221,11 @@ export default function StudyPulseDashboardPage() {
 
         <div className="flex items-center justify-end gap-2 text-[11px] font-mono text-neutral-500 pt-1">
           <span>Less</span>
-          <div className="w-3 h-3 rounded-sm bg-neutral-100 border border-neutral-200" />
-          <div className="w-3 h-3 rounded-sm bg-purple-200 border border-purple-300" />
-          <div className="w-3 h-3 rounded-sm bg-purple-300 border border-purple-400" />
-          <div className="w-3 h-3 rounded-sm bg-purple-500 border border-purple-600" />
-          <div className="w-3 h-3 rounded-sm bg-purple-700 border border-purple-800" />
+          <div className="w-3 h-3 rounded-sm bg-neutral-900 border border-neutral-800" />
+          <div className="w-3 h-3 rounded-sm bg-purple-950/70 border border-purple-800/60" />
+          <div className="w-3 h-3 rounded-sm bg-purple-800/60 border border-purple-600/60" />
+          <div className="w-3 h-3 rounded-sm bg-purple-600 border border-purple-400" />
+          <div className="w-3 h-3 rounded-sm bg-purple-500 border border-purple-300" />
           <span>More</span>
         </div>
       </div>
@@ -233,17 +233,17 @@ export default function StudyPulseDashboardPage() {
       {/* 2. Focus Time Breakdown & Syllabus Milestones */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         
-        {/* Recharts Donut Card with Light Grid Lines (stroke="#f3f4f6") */}
-        <div className="bg-white border border-neutral-200/80 rounded-2xl p-6 sm:p-8 shadow-sm flex flex-col justify-between space-y-4">
-          <div className="flex items-center justify-between border-b border-neutral-100 pb-3">
+        {/* Recharts Donut Card with Subtle Dark Grid Lines (stroke="#262626") */}
+        <div className="bg-[#0A0A0C] border border-neutral-800 rounded-2xl p-6 sm:p-8 shadow-md flex flex-col justify-between space-y-4">
+          <div className="flex items-center justify-between border-b border-neutral-800/80 pb-3">
             <div>
-              <h2 className="font-serif text-xl font-bold text-neutral-950 flex items-center gap-2">
-                <BarChart2 className="w-4 h-4 text-purple-700" />
+              <h2 className="font-sans text-xl font-bold text-white flex items-center gap-2">
+                <BarChart2 className="w-4 h-4 text-purple-400" />
                 Focus Time Subject Breakdown
               </h2>
-              <p className="text-xs text-neutral-500">Distribution of study hours this week</p>
+              <p className="text-xs text-neutral-400">Distribution of study hours this week</p>
             </div>
-            <span className="text-xs font-mono font-bold text-purple-900 bg-purple-50 px-2.5 py-0.5 rounded border border-purple-200">
+            <span className="text-xs font-mono font-bold text-purple-300 bg-purple-500/10 px-2.5 py-0.5 rounded border border-purple-500/20">
               41.0 Total Hours
             </span>
           </div>
@@ -262,12 +262,12 @@ export default function StudyPulseDashboardPage() {
                     dataKey="value"
                   >
                     {MOCK_SUBJECT_BREAKDOWN.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} stroke="#f3f4f6" strokeWidth={2} />
+                      <Cell key={`cell-${index}`} fill={entry.color} stroke="#262626" strokeWidth={2} />
                     ))}
                   </Pie>
                   <Tooltip
                     formatter={(value: any, name: any, item: any) => [`${item.payload.hours} hrs (${value}%)`, name]}
-                    contentStyle={{ backgroundColor: '#ffffff', borderRadius: '12px', border: '1px solid #e5e7eb', fontSize: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}
+                    contentStyle={{ backgroundColor: '#0A0A0C', borderRadius: '12px', border: '1px solid #262626', fontSize: '12px', color: '#E5E7EB' }}
                   />
                 </PieChart>
               </ResponsiveContainer>
@@ -275,12 +275,12 @@ export default function StudyPulseDashboardPage() {
 
             <div className="space-y-2.5 text-xs font-medium">
               {MOCK_SUBJECT_BREAKDOWN.map((subject, idx) => (
-                <div key={idx} className="flex items-center justify-between p-2.5 rounded-xl bg-neutral-50 border border-neutral-200/80">
+                <div key={idx} className="flex items-center justify-between p-2.5 rounded-xl bg-neutral-900/60 border border-neutral-800">
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded-full" style={{ backgroundColor: subject.color }} />
-                    <span className="font-bold text-neutral-900 truncate">{subject.name}</span>
+                    <span className="font-bold text-white truncate">{subject.name}</span>
                   </div>
-                  <span className="font-mono text-neutral-600 font-bold shrink-0">{subject.hours}h ({subject.value}%)</span>
+                  <span className="font-mono text-neutral-400 font-bold shrink-0">{subject.hours}h ({subject.value}%)</span>
                 </div>
               ))}
             </div>
@@ -288,47 +288,47 @@ export default function StudyPulseDashboardPage() {
         </div>
 
         {/* Milestone Progress Card */}
-        <div className="bg-white border border-neutral-200/80 rounded-2xl p-6 sm:p-8 shadow-sm flex flex-col justify-between space-y-4">
-          <div className="flex items-center justify-between border-b border-neutral-100 pb-3">
+        <div className="bg-[#0A0A0C] border border-neutral-800 rounded-2xl p-6 sm:p-8 shadow-md flex flex-col justify-between space-y-4">
+          <div className="flex items-center justify-between border-b border-neutral-800/80 pb-3">
             <div>
-              <h2 className="font-serif text-xl font-bold text-neutral-950 flex items-center gap-2">
-                <Target className="w-4 h-4 text-emerald-700" />
+              <h2 className="font-sans text-xl font-bold text-white flex items-center gap-2">
+                <Target className="w-4 h-4 text-emerald-400" />
                 Syllabus Milestone Progress
               </h2>
-              <p className="text-xs text-neutral-500">{MOCK_MILESTONE_PROGRESS.activeCourse}</p>
+              <p className="text-xs text-neutral-400">{MOCK_MILESTONE_PROGRESS.activeCourse}</p>
             </div>
-            <span className="text-xs font-mono font-bold text-emerald-900 bg-emerald-50 px-2.5 py-0.5 rounded border border-emerald-200">
+            <span className="text-xs font-mono font-bold text-emerald-300 bg-emerald-500/10 px-2.5 py-0.5 rounded border border-emerald-500/20">
               {MOCK_MILESTONE_PROGRESS.percentage}% Complete
             </span>
           </div>
 
           <div className="space-y-4 my-2">
             <div>
-              <div className="flex items-center justify-between text-xs font-bold text-neutral-800 mb-1.5">
+              <div className="flex items-center justify-between text-xs font-bold text-neutral-300 mb-1.5">
                 <span>Completed: {MOCK_MILESTONE_PROGRESS.completed} Milestones</span>
                 <span>Remaining: {MOCK_MILESTONE_PROGRESS.total - MOCK_MILESTONE_PROGRESS.completed} Milestones</span>
               </div>
-              <div className="w-full h-4 bg-neutral-100 border border-neutral-200/80 rounded-full overflow-hidden p-0.5">
+              <div className="w-full h-4 bg-neutral-900 border border-neutral-800 rounded-full overflow-hidden p-0.5">
                 <div
-                  className="h-full rounded-full bg-emerald-500 transition-all duration-1000 shadow-2xs"
+                  className="h-full rounded-full bg-emerald-500 transition-all duration-1000 shadow-[0_0_12px_rgba(16,185,129,0.5)]"
                   style={{ width: `${MOCK_MILESTONE_PROGRESS.percentage}%` }}
                 />
               </div>
             </div>
 
             <div className="space-y-2 text-xs">
-              <span className="text-[10px] font-mono font-bold uppercase text-neutral-400 block tracking-wider">
+              <span className="text-[10px] font-mono font-bold uppercase text-neutral-500 block tracking-wider">
                 Current Target Sprint:
               </span>
-              <div className="p-3.5 rounded-xl bg-emerald-50/70 border border-emerald-200 flex items-center justify-between">
+              <div className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
                   <div>
-                    <span className="font-bold text-neutral-900 block">Dynamic Programming & Memoization</span>
-                    <span className="text-[10px] text-neutral-500">Target: Hard Difficulty • Due Thursday</span>
+                    <span className="font-bold text-white block">Dynamic Programming & Memoization</span>
+                    <span className="text-[10px] text-neutral-400">Target: Hard Difficulty • Due Thursday</span>
                   </div>
                 </div>
-                <span className="px-2 py-0.5 text-[10px] font-mono font-bold bg-emerald-100 text-emerald-950 rounded border border-emerald-300">
+                <span className="px-2 py-0.5 text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-300 rounded border border-emerald-500/30">
                   IN PROGRESS
                 </span>
               </div>
@@ -338,7 +338,7 @@ export default function StudyPulseDashboardPage() {
           <div className="pt-2">
             <a
               href="/brain"
-              className="w-full py-3 rounded-xl font-bold text-xs bg-emerald-50 border border-emerald-200 text-emerald-950 hover:bg-emerald-100 transition-all flex items-center justify-center gap-1.5 shadow-2xs"
+              className="w-full py-3 rounded-xl font-bold text-xs bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 hover:bg-emerald-500/20 transition-all flex items-center justify-center gap-1.5 shadow-xs"
             >
               <span>View Full Syllabus Roadmap</span>
               <ChevronRight className="w-4 h-4" />
