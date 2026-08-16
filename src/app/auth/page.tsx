@@ -80,10 +80,10 @@ export default function AuthPage() {
 
       {/* Brand Link */}
       <Link href="/" className="absolute top-8 left-8 flex items-center gap-2 z-20 hover:opacity-80 transition-opacity">
-        <div className="w-8 h-8 rounded-lg bg-black flex items-center justify-center font-bold text-xs text-white shadow-xs">
+        <div className="w-8 h-8 rounded-lg bg-gray-900 flex items-center justify-center font-bold text-xs text-white shadow-xs">
           N
         </div>
-        <span className="font-extrabold text-sm tracking-wider text-neutral-900">NOVA SANCTUARY</span>
+        <span className="font-extrabold text-sm tracking-wider text-gray-900">NOVA SANCTUARY</span>
       </Link>
 
       {/* Auth Modal Card */}
@@ -93,31 +93,31 @@ export default function AuthPage() {
         transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
         className="w-full max-w-md z-10"
       >
-        <div className="bg-white border border-neutral-200 rounded-2xl p-8 shadow-[0_10px_30px_rgba(0,0,0,0.06),4px_4px_0px_rgba(233,213,255,0.7)] relative overflow-hidden">
+        <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-[0_10px_30px_rgba(0,0,0,0.06),4px_4px_0px_rgba(233,213,255,0.7)] relative overflow-hidden">
           
           <div className="text-center mb-6">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-100 border border-purple-200 text-purple-800 text-xs font-bold mb-3 font-mono">
               <Sparkles className="w-3.5 h-3.5 text-purple-600" />
               Firebase Auth Portal
             </div>
-            <h1 className="text-2xl font-black text-neutral-950 tracking-tight font-sans">
+            <h1 className="text-2xl font-black text-gray-900 tracking-tight font-sans">
               {tab === "LOGIN" ? "Welcome Back to NOVA" : "Join Your Academic Sanctuary"}
             </h1>
-            <p className="text-xs text-neutral-500 mt-1">
+            <p className="text-xs text-gray-500 mt-1">
               Enter your student credentials to access your personalized AI companion
             </p>
           </div>
 
-          <div className="flex items-center p-1 rounded-xl bg-neutral-100 border border-neutral-200 text-xs mb-6">
+          <div className="flex items-center p-1 rounded-xl bg-gray-100 border border-gray-200 text-xs mb-6">
             <button
               onClick={() => { setTab("LOGIN"); setMessage(null); }}
-              className={cn("flex-1 py-2 rounded-lg font-bold transition-all flex items-center justify-center gap-1.5", tab === "LOGIN" ? "bg-black text-white shadow-xs" : "text-neutral-600 hover:text-black")}
+              className={cn("flex-1 py-2 rounded-lg font-bold transition-all flex items-center justify-center gap-1.5", tab === "LOGIN" ? "bg-gray-900 text-white shadow-xs" : "text-gray-600 hover:text-gray-900")}
             >
               <LogIn className="w-3.5 h-3.5" /> Student Login
             </button>
             <button
               onClick={() => { setTab("REGISTER"); setMessage(null); }}
-              className={cn("flex-1 py-2 rounded-lg font-bold transition-all flex items-center justify-center gap-1.5", tab === "REGISTER" ? "bg-black text-white shadow-xs" : "text-neutral-600 hover:text-black")}
+              className={cn("flex-1 py-2 rounded-lg font-bold transition-all flex items-center justify-center gap-1.5", tab === "REGISTER" ? "bg-gray-900 text-white shadow-xs" : "text-gray-600 hover:text-gray-900")}
             >
               <UserPlus className="w-3.5 h-3.5" /> Create Account
             </button>
@@ -126,7 +126,7 @@ export default function AuthPage() {
           <button
             onClick={handleGoogleAuth}
             disabled={loading}
-            className="w-full py-3 rounded-xl bg-neutral-50 border border-neutral-200 hover:bg-neutral-100 text-xs font-bold text-neutral-900 transition-all duration-200 flex items-center justify-center gap-3 shadow-2xs mb-5"
+            className="w-full py-3 rounded-xl bg-gray-50 border border-gray-200 hover:bg-gray-100 text-xs font-bold text-gray-900 transition-all duration-200 flex items-center justify-center gap-3 shadow-2xs mb-5"
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24">
               <path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.6l3.1-3.1C17.3 1.7 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7.3 9 5 12 5z" />
@@ -146,28 +146,28 @@ export default function AuthPage() {
 
           <form onSubmit={handleAuth} className="space-y-4">
             <div>
-              <label className="text-xs font-bold text-neutral-700 block mb-1.5 flex items-center gap-1.5">
+              <label className="text-xs font-bold text-gray-700 block mb-1.5 flex items-center gap-1.5">
                 <Mail className="w-3.5 h-3.5 text-purple-700" /> Student Email Address
               </label>
               <input
                 type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="alex@university.edu"
-                className="w-full bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-xs text-neutral-900 placeholder-neutral-400 focus:outline-none focus:border-neutral-400 transition-all font-medium"
+                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2.5 text-xs text-gray-900 placeholder-gray-400 focus:outline-none focus:border-gray-400 transition-all font-medium"
               />
             </div>
 
             <div>
-              <label className="text-xs font-bold text-neutral-700 block mb-1.5 flex items-center gap-1.5">
+              <label className="text-xs font-bold text-gray-700 block mb-1.5 flex items-center gap-1.5">
                 <Lock className="w-3.5 h-3.5 text-purple-700" /> Password
               </label>
               <input
                 type="password" required value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••••••"
-                className="w-full bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5 text-xs text-neutral-900 placeholder-neutral-400 focus:outline-none focus:border-neutral-400 transition-all font-medium"
+                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2.5 text-xs text-gray-900 placeholder-gray-400 focus:outline-none focus:border-gray-400 transition-all font-medium"
               />
             </div>
 
             <div className="flex items-center justify-between text-xs pt-1">
-              <label className="flex items-center gap-2 cursor-pointer text-neutral-600 hover:text-black">
-                <input type="checkbox" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} className="rounded bg-neutral-100 border-neutral-300 text-purple-600 focus:ring-0 cursor-pointer" />
+              <label className="flex items-center gap-2 cursor-pointer text-gray-600 hover:text-gray-900">
+                <input type="checkbox" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} className="rounded bg-gray-100 border-gray-300 text-purple-600 focus:ring-0 cursor-pointer" />
                 <span>Remember Me</span>
               </label>
               <a href="#" className="text-purple-700 hover:underline font-semibold">Forgot password?</a>
@@ -175,7 +175,7 @@ export default function AuthPage() {
 
             <button
               type="submit" disabled={loading}
-              className="w-full py-3 rounded-xl font-bold text-xs bg-black text-white hover:bg-neutral-800 transition-all flex items-center justify-center gap-2 mt-2 shadow-sm"
+              className="w-full py-3 rounded-xl font-bold text-xs bg-gray-900 text-white hover:bg-gray-800 transition-all flex items-center justify-center gap-2 mt-2 shadow-xs"
             >
               {loading ? "Connecting to Firebase..." : tab === "LOGIN" ? "Sign In with Firebase" : "Create Firebase Account"}
               <ArrowRight className="w-4 h-4" />

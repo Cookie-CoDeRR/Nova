@@ -122,23 +122,23 @@ export default function TutorPage() {
   };
 
   return (
-    <div className="min-h-[calc(100vh-140px)] bg-black text-neutral-300 flex flex-col justify-between items-center py-6 px-4 font-sans">
+    <div className="min-h-[calc(100vh-140px)] bg-[#FAFAFA] text-gray-700 flex flex-col justify-between items-center py-6 px-4 font-sans">
       
       {/* Centered Document-Style Container (max-w-3xl) */}
       <div className="w-full max-w-3xl flex-1 flex flex-col justify-between space-y-6">
         
         {/* Top Header Card */}
-        <div className="bg-[#0A0A0C] border border-neutral-800 rounded-2xl p-6 shadow-md flex items-center justify-between">
+        <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-purple-600/20 border border-purple-500/30 flex items-center justify-center text-purple-400 shadow-[0_0_15px_rgba(124,58,237,0.3)]">
+            <div className="w-10 h-10 rounded-xl bg-purple-100 border border-purple-200 flex items-center justify-center text-purple-800 shadow-xs">
               <Bot className="w-5 h-5" />
             </div>
             <div>
-              <div className="inline-flex items-center gap-1.5 text-[10px] font-bold font-mono uppercase tracking-wider text-purple-400 bg-purple-500/10 px-2 py-0.5 rounded border border-purple-500/20 mb-0.5">
-                <Sparkles className="w-3 h-3 text-purple-400" />
+              <div className="inline-flex items-center gap-1.5 text-[10px] font-bold font-mono uppercase tracking-wider text-purple-800 bg-purple-50 px-2 py-0.5 rounded border border-purple-200 mb-0.5">
+                <Sparkles className="w-3 h-3 text-purple-600" />
                 Socratic AI Engine
               </div>
-              <h1 className="font-sans text-xl sm:text-2xl font-bold text-white tracking-tight">
+              <h1 className="font-serif text-xl sm:text-2xl font-bold text-gray-900 tracking-tight">
                 Academic Socratic Tutor
               </h1>
             </div>
@@ -146,7 +146,7 @@ export default function TutorPage() {
 
           <button
             onClick={clearChat}
-            className="p-2 rounded-xl bg-neutral-900 border border-neutral-800 text-neutral-400 hover:text-red-400 hover:border-red-500/30 transition-colors text-xs flex items-center gap-1.5 font-bold"
+            className="p-2 rounded-xl bg-gray-100 border border-gray-200 text-gray-600 hover:text-red-600 hover:bg-red-50 transition-colors text-xs flex items-center gap-1.5 font-bold"
             title="Reset Chat"
           >
             <Trash2 className="w-4 h-4" />
@@ -168,33 +168,33 @@ export default function TutorPage() {
                 className={cn("flex flex-col gap-1.5 max-w-full", isUser ? "items-end" : "items-start")}
               >
                 {/* Role badge */}
-                <div className="flex items-center gap-1.5 text-[10px] font-mono font-bold uppercase tracking-wider text-neutral-500 px-1">
+                <div className="flex items-center gap-1.5 text-[10px] font-mono font-bold uppercase tracking-wider text-gray-400 px-1">
                   {isUser ? (
                     <>
                       <span>Student Note</span>
-                      <User className="w-3 h-3 text-neutral-400" />
+                      <User className="w-3 h-3 text-gray-700" />
                     </>
                   ) : (
                     <>
-                      <Bot className="w-3 h-3 text-purple-400" />
+                      <Bot className="w-3 h-3 text-purple-700" />
                       <span>NOVA Socratic Guidance</span>
                     </>
                   )}
                 </div>
 
-                {/* Bubble Container: User (solid dark charcoal with white text) vs AI (clean minimalist cards with a subtle left purple accent line) */}
+                {/* Bubble Container: User (solid dark charcoal block) vs AI (crisp white card with left purple accent) */}
                 <div
                   className={cn(
                     "text-sm leading-relaxed max-w-[90%] sm:max-w-[85%]",
                     isUser
-                      ? "p-5 rounded-2xl rounded-tr-none bg-neutral-900 border border-white/10 text-white shadow-md font-medium"
-                      : "p-6 rounded-2xl rounded-tl-none bg-[#0A0A0C] border border-neutral-800 border-l-2 border-l-purple-500 text-neutral-300 shadow-md"
+                      ? "p-5 rounded-2xl rounded-tr-none bg-gray-900 text-white shadow-xs font-medium"
+                      : "p-6 rounded-2xl rounded-tl-none bg-white border border-gray-200 border-l-4 border-l-purple-600 text-gray-800 shadow-sm"
                   )}
                 >
                   {isUser ? (
                     <p className="whitespace-pre-wrap font-medium">{msg.content}</p>
                   ) : (
-                    <div className="prose prose-invert max-w-none text-neutral-300 text-sm leading-relaxed space-y-3">
+                    <div className="prose prose-neutral max-w-none text-gray-800 text-sm leading-relaxed space-y-3">
                       <ReactMarkdown>{msg.content}</ReactMarkdown>
                     </div>
                   )}
@@ -205,8 +205,8 @@ export default function TutorPage() {
 
           {/* Streaming Indicator */}
           {isLoading && (
-            <div className="flex items-center gap-2 text-xs text-purple-400 font-mono font-bold py-2 px-1">
-              <Sparkles className="w-4 h-4 animate-spin text-purple-400" />
+            <div className="flex items-center gap-2 text-xs text-purple-700 font-mono font-bold py-2 px-1">
+              <Sparkles className="w-4 h-4 animate-spin text-purple-600" />
               <span>NOVA is streaming Socratic guidance...</span>
             </div>
           )}
@@ -215,7 +215,7 @@ export default function TutorPage() {
         </div>
 
         {/* Quick Action Chips & Floating Command Bar Input */}
-        <div className="sticky bottom-4 pt-4 bg-gradient-to-t from-black via-black/90 to-transparent space-y-3">
+        <div className="sticky bottom-4 pt-4 bg-gradient-to-t from-[#FAFAFA] via-[#FAFAFA]/90 to-transparent space-y-3">
           
           {/* Quick Action Chips Row */}
           <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
@@ -224,7 +224,7 @@ export default function TutorPage() {
                 key={chip.id}
                 disabled={isLoading}
                 onClick={() => handleSubmit(chip.prompt)}
-                className="shrink-0 bg-[#0A0A0C] border border-neutral-800 hover:border-purple-500/40 hover:bg-neutral-900 rounded-full text-xs font-semibold px-4 py-2 text-neutral-300 transition-all duration-200 shadow-xs"
+                className="shrink-0 bg-white border border-gray-200 hover:border-gray-400 hover:bg-gray-50 rounded-full text-xs font-semibold px-4 py-2 text-gray-700 transition-all duration-200 shadow-2xs"
               >
                 {chip.label}
               </button>
@@ -232,7 +232,7 @@ export default function TutorPage() {
           </div>
 
           {/* Floating Command Bar Input Area */}
-          <div className="relative flex items-center p-2.5 rounded-2xl bg-[#0A0A0C] border border-neutral-800 shadow-[0_8px_32px_rgba(0,0,0,0.6)] focus-within:border-purple-500/50 transition-all">
+          <div className="relative flex items-center p-2.5 rounded-2xl bg-white border border-gray-200 shadow-md focus-within:border-gray-400 transition-all">
             <textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
@@ -240,7 +240,7 @@ export default function TutorPage() {
               placeholder="Ask NOVA a question... (Press Enter to send)"
               rows={1}
               disabled={isLoading}
-              className="w-full bg-transparent text-sm text-white placeholder-neutral-500 px-3 py-2 focus:outline-none resize-none max-h-32 min-h-[44px] font-medium"
+              className="w-full bg-transparent text-sm text-gray-900 placeholder-gray-400 px-3 py-2 focus:outline-none resize-none max-h-32 min-h-[44px] font-medium"
             />
 
             <button
@@ -249,8 +249,8 @@ export default function TutorPage() {
               className={cn(
                 "p-3 rounded-xl transition-all shrink-0 flex items-center justify-center ml-1",
                 input.trim() && !isLoading
-                  ? "bg-purple-600 text-white shadow-[0_0_15px_rgba(124,58,237,0.5)] hover:bg-purple-500 scale-105"
-                  : "bg-neutral-900 text-neutral-600 cursor-not-allowed"
+                  ? "bg-gray-900 text-white shadow-xs hover:bg-gray-800 scale-105"
+                  : "bg-gray-100 text-gray-400 cursor-not-allowed"
               )}
             >
               <Send className="w-4 h-4" />

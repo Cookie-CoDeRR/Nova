@@ -18,23 +18,23 @@ export function GlassCard({
   glowColor = "none",
   ...props
 }: GlassCardProps) {
-  const colorShadows = {
-    none: "shadow-sm border-neutral-200 hover:border-neutral-300",
-    purple: "shadow-sm border-purple-200 hover:border-purple-300",
-    blue: "shadow-sm border-blue-200 hover:border-blue-300",
-    amber: "shadow-sm border-amber-200 hover:border-amber-300",
-    emerald: "shadow-sm border-emerald-200 hover:border-emerald-300",
+  const colorBorders = {
+    none: "border-gray-200 hover:border-gray-300",
+    purple: "border-purple-200 hover:border-purple-300",
+    blue: "border-blue-200 hover:border-blue-300",
+    amber: "border-amber-200 hover:border-amber-300",
+    emerald: "border-emerald-200 hover:border-emerald-300",
   };
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 10 }}
+      initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+      transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
       className={cn(
-        "rounded-2xl relative overflow-hidden bg-white border transition-all duration-200 text-neutral-900",
+        "rounded-2xl relative overflow-hidden bg-white border shadow-sm transition-all duration-200 text-gray-800",
         interactive && "cursor-pointer hover:-translate-y-1 hover:shadow-md",
-        colorShadows[glowColor],
+        colorBorders[glowColor],
         className
       )}
       {...props}

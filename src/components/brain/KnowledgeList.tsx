@@ -81,16 +81,16 @@ export function KnowledgeList() {
   });
 
   return (
-    <div className="space-y-6 font-sans">
+    <div className="space-y-6 font-sans text-gray-700">
       {/* Header & Controls */}
-      <div className="bg-[#0A0A0C] border border-neutral-800 rounded-2xl p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-md">
+      <div className="bg-white border border-gray-200 rounded-2xl p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
         <div className="flex items-center gap-3">
-          <div className="p-3 rounded-2xl bg-purple-500/10 border border-purple-500/20 text-purple-400">
+          <div className="p-3 rounded-2xl bg-purple-50 border border-purple-200 text-purple-800">
             <Brain className="w-6 h-6" />
           </div>
           <div>
-            <h2 className="font-sans text-xl font-bold text-white tracking-tight">Syllabus & Knowledge Base</h2>
-            <p className="text-xs text-neutral-400">
+            <h2 className="font-serif text-xl font-bold text-gray-900 tracking-tight">Syllabus & Knowledge Base</h2>
+            <p className="text-xs text-gray-600">
               Uploaded notes & syllabi are automatically fed into NOVA's AI Socratic Tutor memory.
             </p>
           </div>
@@ -98,7 +98,7 @@ export function KnowledgeList() {
 
         <button
           onClick={() => setIsModalOpen(true)}
-          className="px-4 py-2.5 rounded-full font-bold text-xs bg-purple-600 text-white shadow-[0_0_15px_rgba(124,58,237,0.4)] hover:bg-purple-500 flex items-center justify-center gap-2 transition-all"
+          className="px-4 py-2.5 rounded-full font-bold text-xs bg-gray-900 text-white shadow-xs hover:bg-gray-800 flex items-center justify-center gap-2 transition-all"
         >
           <Plus className="w-4 h-4" />
           Add Syllabus / Note
@@ -108,17 +108,17 @@ export function KnowledgeList() {
       {/* Search & Filter Bar */}
       <div className="flex flex-col sm:flex-row items-center gap-3">
         <div className="relative flex-1 w-full">
-          <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-500" />
+          <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
           <input
             type="text"
             placeholder="Search notes, course codes, or tags..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-[#0A0A0C] border border-neutral-800 text-xs text-white placeholder-neutral-500 focus:outline-none focus:border-purple-500/50 font-medium"
+            className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-white border border-gray-200 text-xs text-gray-900 placeholder-gray-400 focus:outline-none focus:border-gray-400 font-medium shadow-2xs"
           />
         </div>
 
-        <div className="flex items-center gap-1 p-1 rounded-2xl bg-[#0A0A0C] border border-neutral-800 text-xs overflow-x-auto w-full sm:w-auto">
+        <div className="flex items-center gap-1 p-1 rounded-2xl bg-white border border-gray-200 text-xs overflow-x-auto w-full sm:w-auto shadow-2xs">
           {["ALL", "c1", "c2", "c3"].map((cid) => {
             const label = cid === "ALL" ? "All Courses" : cid === "c1" ? "CS 301" : cid === "c2" ? "PHYS 202" : "MATH 240";
             return (
@@ -128,8 +128,8 @@ export function KnowledgeList() {
                 className={cn(
                   "px-3 py-1.5 rounded-xl font-semibold transition-all whitespace-nowrap",
                   filterCourse === cid
-                    ? "bg-purple-600 text-white shadow-xs"
-                    : "text-neutral-400 hover:text-white hover:bg-neutral-900"
+                    ? "bg-gray-900 text-white shadow-xs"
+                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
                 )}
               >
                 {label}
@@ -143,7 +143,7 @@ export function KnowledgeList() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-3">
           {filteredNotes.length === 0 ? (
-            <div className="p-8 text-center text-neutral-500 text-xs bg-[#0A0A0C] border border-neutral-800 rounded-2xl">
+            <div className="p-8 text-center text-gray-500 text-xs bg-white border border-gray-200 rounded-2xl">
               No notes or syllabi match your current filter. Click "Add Syllabus / Note" to create one!
             </div>
           ) : (
@@ -155,39 +155,39 @@ export function KnowledgeList() {
                   key={note.id}
                   onClick={() => setSelectedNote(note)}
                   className={cn(
-                    "p-5 rounded-2xl bg-[#0A0A0C] border transition-all duration-200 cursor-pointer shadow-xs",
-                    isSelected ? "border-purple-500/60 bg-purple-950/20 shadow-[0_0_20px_rgba(124,58,237,0.15)]" : "border-neutral-800 hover:border-neutral-700"
+                    "p-5 rounded-2xl bg-white border transition-all duration-200 cursor-pointer shadow-2xs",
+                    isSelected ? "border-purple-300 bg-purple-50/50 shadow-sm" : "border-gray-200 hover:border-gray-300"
                   )}
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex items-start gap-3">
-                      <div className="p-2.5 rounded-xl bg-neutral-900 border border-neutral-800 text-purple-400 mt-0.5">
+                      <div className="p-2.5 rounded-xl bg-gray-100 border border-gray-200 text-purple-700 mt-0.5">
                         <FileText className="w-5 h-5" />
                       </div>
 
                       <div>
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-neutral-900 text-white border border-neutral-800">
+                          <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-gray-100 text-gray-900 border border-gray-200">
                             {note.course?.code}
                           </span>
-                          <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-neutral-900 text-neutral-400 border border-neutral-800 uppercase font-mono">
+                          <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-gray-100 text-gray-600 border border-gray-200 uppercase font-mono">
                             {note.type}
                           </span>
                         </div>
 
-                        <h3 className="text-sm font-bold text-white tracking-tight mb-1">
+                        <h3 className="text-sm font-bold text-gray-900 tracking-tight mb-1">
                           {note.title}
                         </h3>
 
-                        <p className="text-xs text-neutral-400 line-clamp-2 font-mono">
+                        <p className="text-xs text-gray-600 line-clamp-2 font-mono">
                           {note.content}
                         </p>
 
                         {note.tags && (
                           <div className="flex items-center gap-1.5 mt-3 flex-wrap">
-                            <Tag className="w-3 h-3 text-neutral-500" />
+                            <Tag className="w-3 h-3 text-gray-400" />
                             {note.tags.split(",").map((t, idx) => (
-                              <span key={idx} className="text-[10px] font-mono text-purple-300 bg-purple-500/10 px-2 py-0.5 rounded-full border border-purple-500/20">
+                              <span key={idx} className="text-[10px] font-mono text-gray-600 bg-gray-100 px-2 py-0.5 rounded-full border border-gray-200">
                                 #{t.trim()}
                               </span>
                             ))}
@@ -199,7 +199,7 @@ export function KnowledgeList() {
                     <div className="flex items-center gap-2 shrink-0">
                       <button
                         onClick={(e) => handleDeleteNote(note.id, e)}
-                        className="p-1.5 rounded-lg text-neutral-500 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                        className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors"
                         title="Delete Note"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -214,37 +214,37 @@ export function KnowledgeList() {
 
         {/* Selected Note Detail / Preview Panel */}
         <div className="lg:col-span-1">
-          <div className="bg-[#0A0A0C] border border-neutral-800 rounded-2xl p-6 h-full flex flex-col justify-between shadow-md">
+          <div className="bg-white border border-gray-200 rounded-2xl p-6 h-full flex flex-col justify-between shadow-sm">
             {selectedNote ? (
               <div className="space-y-4">
-                <div className="flex items-center justify-between border-b border-neutral-800/80 pb-3">
-                  <span className="px-2.5 py-1 rounded text-xs font-mono font-bold bg-neutral-900 text-white border border-neutral-800">
+                <div className="flex items-center justify-between border-b border-gray-100 pb-3">
+                  <span className="px-2.5 py-1 rounded text-xs font-mono font-bold bg-gray-100 text-gray-900 border border-gray-200">
                     {selectedNote.course?.code}
                   </span>
-                  <span className="text-[10px] text-neutral-500 font-mono">
+                  <span className="text-[10px] text-gray-400 font-mono">
                     Updated {formatDate(selectedNote.updatedAt)}
                   </span>
                 </div>
 
-                <h3 className="text-base font-bold text-white tracking-tight font-sans">
+                <h3 className="text-base font-bold text-gray-900 tracking-tight font-serif">
                   {selectedNote.title}
                 </h3>
 
-                <div className="p-4 rounded-xl bg-black border border-neutral-800 text-xs font-mono text-neutral-300 leading-relaxed max-h-96 overflow-y-auto whitespace-pre-wrap">
+                <div className="p-4 rounded-xl bg-gray-50 border border-gray-200 text-xs font-mono text-gray-800 leading-relaxed max-h-96 overflow-y-auto whitespace-pre-wrap">
                   {selectedNote.content}
                 </div>
 
                 <Link
                   href={`/tutor?course=${selectedNote.courseId}`}
-                  className="w-full py-2.5 rounded-xl font-bold text-xs bg-purple-600 border border-purple-500 text-white hover:bg-purple-500 flex items-center justify-center gap-2 transition-all shadow-[0_0_15px_rgba(124,58,237,0.4)]"
+                  className="w-full py-2.5 rounded-xl font-bold text-xs bg-purple-50 border border-purple-200 text-purple-900 hover:bg-purple-100 flex items-center justify-center gap-2 transition-all shadow-2xs"
                 >
-                  <Sparkles className="w-4 h-4" />
+                  <Sparkles className="w-4 h-4 text-purple-600" />
                   Ask AI Tutor About This Document
                 </Link>
               </div>
             ) : (
-              <div className="flex flex-col items-center justify-center text-center text-neutral-500 py-12">
-                <BookOpen className="w-10 h-10 mb-2 stroke-[1.5] text-neutral-600" />
+              <div className="flex flex-col items-center justify-center text-center text-gray-500 py-12">
+                <BookOpen className="w-10 h-10 mb-2 stroke-[1.5] text-gray-400" />
                 <p className="text-xs font-medium">Select any note or syllabus from the list to view its full content & AI indexing status.</p>
               </div>
             )}

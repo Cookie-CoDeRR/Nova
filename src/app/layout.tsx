@@ -26,11 +26,11 @@ export default function RootLayout({
         <title>NOVA | AI Student Personalised Assistant</title>
         <meta name="description" content="Proactive digital companion for university students with Socratic AI tutoring, syllabus knowledge base, and focus management." />
       </head>
-      <body className="bg-[#FAFAFA] text-neutral-900 min-h-screen relative antialiased selection:bg-purple-600 selection:text-white">
-        {/* Ambient Dot Grid Background */}
+      <body className="bg-[#FAFAFA] text-gray-700 min-h-screen relative antialiased selection:bg-purple-100 selection:text-purple-900">
+        {/* Faint Dot Grid Background */}
         <GlowBackground />
 
-        {/* Global Header */}
+        {/* Global Light Top Header */}
         {!isAuthPage && !isLandingPage && (
           <TopHeader urgentCount={2} studentName="Alex" gpa={3.85} streakDays={7} />
         )}
@@ -40,7 +40,7 @@ export default function RootLayout({
           {children}
         </main>
 
-        {/* Floating Pill Navigation */}
+        {/* Floating Glass Pill Navigation */}
         {!isAuthPage && (
           <FloatingNav
             isFocusModeActive={isFocusModeActive}
