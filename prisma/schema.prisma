@@ -1,0 +1,94 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Student {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String
+  avatar    String?
+  gpa       Float    @default(3.85)
+  streak    Int      @default(7)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  courses     Course[]
+  assignments Assignment[]
+  notes       Note[]
+  chatHistory ChatHistory[]
+}
+
+model Course {
+  id          String   @id @default(uuid())
+  code        String   // e.g. "CS301"
+  name        String   // e.g. "Data Structures & Algorithms"
+  professor   String?
+  color       String   @default("#7C3AED") // Accent color hex
+  studentId   String
+  student     Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  assignments Assignment[]
+  notes       Note[]
+  chatHistory ChatHistory[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Assignment {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  dueDate     DateTime
+  urgency     String   @default("MEDIUM") // "HIGH", "MEDIUM", "LOW"
+  completed   Boolean  @default(false)
+  
+  courseId    String
+  course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  
+  studentId   String
+  student     Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Note {
+  id          String   @id @default(uuid())
+  title       String
+  content     String
+  type        String   @default("NOTE") // "SYLLABUS", "NOTE", "SUMMARY"
+  tags        String?  // comma-separated tags
+
+  courseId    String
+  course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  studentId   String
+  student     Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model ChatHistory {
+  id        String   @id @default(uuid())
+  role      String   // "user" or "assistant"
+  message   String
+  chips     String?  // Optional trigger chips used
+  
+  courseId  String?
+  course    Course?  @relation(fields: [courseId], references: [id], onDelete: SetNull)
+
+  studentId String
+  student   Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+}
