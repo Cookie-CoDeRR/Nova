@@ -2,36 +2,74 @@
 
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { generateMockHeatmapData, MOCK_SUBJECT_BREAKDOWN, MOCK_MILESTONE_PROGRESS, MOCK_ANALYTICS_SUMMARY, HeatmapDay } from "@/lib/mockData";
+import { generateMockHeatmapData, MOCK_SUBJECT_BREAKDOWN_FULL, MOCK_SUBJECT_BREAKDOWN_EMPTY, HeatmapDay } from "@/lib/mockData";
 import { generateWeeklyReportAction } from "@/app/actions/generate-weekly-report";
-import { getStudentProfile, StudentProfile, DEFAULT_PROFILE } from "@/lib/userProfile";
+import { getStudentProfile, saveStudentProfile, StudentProfile, NEW_USER_PROFILE, DEMO_SAMPLE_PROFILE } from "@/lib/userProfile";
 import { EditProfileModal } from "@/components/dashboard/EditProfileModal";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
-import { Flame, Clock, Target, Sparkles, TrendingUp, CheckCircle2, ChevronRight, BarChart2, GraduationCap, Settings, User } from "lucide-react";
+import { Flame, Clock, Target, Sparkles, TrendingUp, CheckCircle2, ChevronRight, BarChart2, Settings, RefreshCcw, ToggleLeft, ToggleRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import ReactMarkdown from "react-markdown";
 
 export default function StudyPulseDashboardPage() {
-  const [profile, setProfile] = useState<StudentProfile>(DEFAULT_PROFILE);
-  const [heatmapData] = useState<HeatmapDay[]>(generateMockHeatmapData());
+  const [profile, setProfile] = useState<StudentProfile>(NEW_USER_PROFILE);
+  const [isDemoDataLoaded, setIsDemoDataLoaded] = useState(false);
+  const [heatmapData, setHeatmapData] = useState<HeatmapDay[]>(generateMockHeatmapData(true));
   const [hoveredDay, setHoveredDay] = useState<HeatmapDay | null>(null);
   const [weeklyReport, setWeeklyReport] = useState<string | null>(null);
   const [isReportLoading, setIsReportLoading] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   useEffect(() => {
-    getStudentProfile().then((p) => setProfile(p));
+    getStudentProfile().then((p) => {
+      setProfile(p);
+      const isDemo = p.isDemoUser || p.totalFocusHours > 0;
+      setIsDemoDataLoaded(isDemo);
+      setHeatmapData(generateMockHeatmapData(!isDemo));
+    });
   }, []);
+
+  const toggleDemoData = async () => {
+    const nextState = !isDemoDataLoaded;
+    setIsDemoDataLoaded(nextState);
+    setHeatmapData(generateMockHeatmapData(!nextState));
+
+    if (nextState) {
+      const updated = await saveStudentProfile({
+        ...profile,
+        streakDays: 7,
+        gpa: 3.85,
+        totalFocusHours: 41.0,
+        completedMilestones: 12,
+        totalMilestones: 16,
+        quizAccuracy: 92,
+        isDemoUser: true,
+      });
+      setProfile(updated);
+    } else {
+      const updated = await saveStudentProfile({
+        ...profile,
+        streakDays: 0,
+        gpa: 0.0,
+        totalFocusHours: 0,
+        completedMilestones: 0,
+        totalMilestones: 16,
+        quizAccuracy: 0,
+        isDemoUser: false,
+      });
+      setProfile(updated);
+    }
+  };
 
   const handleGenerateReport = async () => {
     setIsReportLoading(true);
     try {
       const res = await generateWeeklyReportAction({
-        totalHours: MOCK_ANALYTICS_SUMMARY.totalFocusHours,
-        streak: MOCK_ANALYTICS_SUMMARY.weeklyStreak,
-        completedMilestones: MOCK_MILESTONE_PROGRESS.completed,
-        totalMilestones: MOCK_MILESTONE_PROGRESS.total,
-        topSubject: MOCK_SUBJECT_BREAKDOWN[0].name,
+        totalHours: profile.totalFocusHours || 0,
+        streak: profile.streakDays || 0,
+        completedMilestones: profile.completedMilestones || 0,
+        totalMilestones: profile.totalMilestones || 16,
+        topSubject: profile.specializations[0] || "Data Structures",
       });
 
       if (res.success && res.report) {
@@ -52,15 +90,38 @@ export default function StudyPulseDashboardPage() {
     4: "bg-purple-700 hover:bg-purple-800 border-purple-800",
   };
 
+  const subjectBreakdownData = isDemoDataLoaded ? MOCK_SUBJECT_BREAKDOWN_FULL : MOCK_SUBJECT_BREAKDOWN_EMPTY;
+
   return (
     <div className="w-full max-w-7xl mx-auto space-y-8 font-sans text-gray-800 pb-16">
       
       {/* Header Banner */}
       <div className="bg-white border border-gray-200 rounded-3xl p-6 sm:p-8 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6 relative overflow-hidden">
         <div className="space-y-1.5">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-50 text-purple-900 border border-purple-200 text-xs font-bold font-mono">
-            <BarChart2 className="w-3.5 h-3.5 text-purple-700" />
-            ACADEMIC COMMAND CENTER • {profile.university}
+          <div className="flex items-center gap-2 flex-wrap">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-50 text-purple-900 border border-purple-200 text-xs font-bold font-mono">
+              <BarChart2 className="w-3.5 h-3.5 text-purple-700" />
+              ACADEMIC COMMAND CENTER • {profile.university}
+            </div>
+
+            {/* Toggle Demo / Clean Data Button */}
+            <button
+              onClick={toggleDemoData}
+              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300 text-xs font-bold font-mono transition-all cursor-pointer"
+              title="Switch between Clean New User Profile and Sample Demo Data"
+            >
+              {isDemoDataLoaded ? (
+                <>
+                  <ToggleRight className="w-4 h-4 text-purple-700" />
+                  <span>Demo Mode: ON</span>
+                </>
+              ) : (
+                <>
+                  <ToggleLeft className="w-4 h-4 text-gray-400" />
+                  <span>Demo Mode: OFF (Clean Profile)</span>
+                </>
+              )}
+            </button>
           </div>
           
           <h1 className="font-serif text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight">
@@ -87,7 +148,7 @@ export default function StudyPulseDashboardPage() {
         <div className="flex items-center gap-3 shrink-0">
           <button
             onClick={() => setIsEditModalOpen(true)}
-            className="px-4 py-3 rounded-full font-bold text-xs bg-gray-100 border border-gray-200 text-gray-700 hover:bg-gray-200 transition-all flex items-center gap-1.5"
+            className="px-4 py-3 rounded-full font-bold text-xs bg-gray-100 border border-gray-200 text-gray-700 hover:bg-gray-200 transition-all flex items-center gap-1.5 cursor-pointer"
           >
             <Settings className="w-4 h-4" />
             <span>Edit Profile</span>
@@ -106,12 +167,12 @@ export default function StudyPulseDashboardPage() {
             {isReportLoading ? (
               <>
                 <Sparkles className="w-4 h-4 animate-spin text-amber-400" />
-                Generating Weekly Digest...
+                Generating Digest...
               </>
             ) : (
               <>
                 <Sparkles className="w-4 h-4 text-amber-400" />
-                Generate Weekly AI Report
+                Generate Weekly AI Digest
               </>
             )}
           </button>
@@ -149,12 +210,12 @@ export default function StudyPulseDashboardPage() {
           <div className="flex items-center justify-between text-purple-800">
             <Clock className="w-5 h-5" />
             <span className="text-[10px] font-bold font-mono px-2 py-0.5 rounded bg-purple-50 border border-purple-200">
-              THIS WEEK
+              FOCUS TIME
             </span>
           </div>
           <div className="mt-4">
             <div className="text-3xl font-black font-mono text-gray-900 tracking-tight">
-              {MOCK_ANALYTICS_SUMMARY.totalFocusHours}h
+              {profile.totalFocusHours}h
             </div>
             <div className="text-xs text-gray-600 font-medium mt-0.5">Total Focused Study</div>
           </div>
@@ -165,12 +226,12 @@ export default function StudyPulseDashboardPage() {
           <div className="flex items-center justify-between text-amber-800">
             <Flame className="w-5 h-5 fill-amber-500/20" />
             <span className="text-[10px] font-bold font-mono px-2 py-0.5 rounded bg-amber-50 border border-amber-200">
-              ACTIVE
+              STREAK
             </span>
           </div>
           <div className="mt-4">
             <div className="text-3xl font-black font-mono text-gray-900 tracking-tight flex items-center gap-1">
-              <span>{MOCK_ANALYTICS_SUMMARY.weeklyStreak}</span>
+              <span>{profile.streakDays}</span>
               <span className="text-sm font-normal text-gray-500">Days</span>
             </div>
             <div className="text-xs text-gray-600 font-medium mt-0.5">Consecutive Streak</div>
@@ -182,12 +243,12 @@ export default function StudyPulseDashboardPage() {
           <div className="flex items-center justify-between text-emerald-800">
             <Target className="w-5 h-5" />
             <span className="text-[10px] font-bold font-mono px-2 py-0.5 rounded bg-emerald-50 border border-emerald-200">
-              75% DONE
+              {profile.totalMilestones > 0 ? Math.round((profile.completedMilestones / profile.totalMilestones) * 100) : 0}% DONE
             </span>
           </div>
           <div className="mt-4">
             <div className="text-3xl font-black font-mono text-gray-900 tracking-tight">
-              {MOCK_MILESTONE_PROGRESS.completed}/{MOCK_MILESTONE_PROGRESS.total}
+              {profile.completedMilestones}/{profile.totalMilestones || 16}
             </div>
             <div className="text-xs text-gray-600 font-medium mt-0.5">Milestones Conquered</div>
           </div>
@@ -203,7 +264,7 @@ export default function StudyPulseDashboardPage() {
           </div>
           <div className="mt-4">
             <div className="text-3xl font-black font-mono text-gray-900 tracking-tight">
-              {MOCK_ANALYTICS_SUMMARY.avgAccuracy}%
+              {profile.quizAccuracy}%
             </div>
             <div className="text-xs text-gray-600 font-medium mt-0.5">Quiz Mastery Score</div>
           </div>
@@ -218,7 +279,11 @@ export default function StudyPulseDashboardPage() {
               <Clock className="w-4 h-4 text-purple-700" />
               12-Week Study Productivity Heatmap
             </h2>
-            <p className="text-xs text-gray-500">Each cell represents daily focus timer & Socratic tutor activity</p>
+            <p className="text-xs text-gray-500">
+              {isDemoDataLoaded
+                ? "Each cell represents daily focus timer & Socratic tutor activity"
+                : "No study sessions logged yet. Complete a Pomodoro session to light up your heatmap!"}
+            </p>
           </div>
 
           {/* Tooltip display */}
@@ -276,7 +341,7 @@ export default function StudyPulseDashboardPage() {
               <p className="text-xs text-gray-500">Distribution of study hours this week</p>
             </div>
             <span className="text-xs font-mono font-bold text-purple-900 bg-purple-50 px-2.5 py-0.5 rounded border border-purple-200">
-              41.0 Total Hours
+              {profile.totalFocusHours} Total Hours
             </span>
           </div>
 
@@ -285,7 +350,7 @@ export default function StudyPulseDashboardPage() {
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
-                    data={MOCK_SUBJECT_BREAKDOWN}
+                    data={subjectBreakdownData}
                     cx="50%"
                     cy="50%"
                     innerRadius={50}
@@ -293,7 +358,7 @@ export default function StudyPulseDashboardPage() {
                     paddingAngle={4}
                     dataKey="value"
                   >
-                    {MOCK_SUBJECT_BREAKDOWN.map((entry, index) => (
+                    {subjectBreakdownData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.color} stroke="#f3f4f6" strokeWidth={2} />
                     ))}
                   </Pie>
@@ -306,7 +371,7 @@ export default function StudyPulseDashboardPage() {
             </div>
 
             <div className="space-y-2.5 text-xs font-medium">
-              {MOCK_SUBJECT_BREAKDOWN.map((subject, idx) => (
+              {subjectBreakdownData.map((subject, idx) => (
                 <div key={idx} className="flex items-center justify-between p-2.5 rounded-xl bg-gray-50 border border-gray-200">
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded-full" style={{ backgroundColor: subject.color }} />
@@ -327,42 +392,45 @@ export default function StudyPulseDashboardPage() {
                 <Target className="w-4 h-4 text-emerald-700" />
                 Syllabus Milestone Progress
               </h2>
-              <p className="text-xs text-gray-500">{MOCK_MILESTONE_PROGRESS.activeCourse}</p>
+              <p className="text-xs text-gray-500">CS 301 Data Structures & Algorithms</p>
             </div>
             <span className="text-xs font-mono font-bold text-emerald-900 bg-emerald-50 px-2.5 py-0.5 rounded border border-emerald-200">
-              {MOCK_MILESTONE_PROGRESS.percentage}% Complete
+              {profile.totalMilestones > 0 ? Math.round((profile.completedMilestones / profile.totalMilestones) * 100) : 0}% Complete
             </span>
           </div>
 
           <div className="space-y-4 my-2">
             <div>
               <div className="flex items-center justify-between text-xs font-bold text-gray-800 mb-1.5">
-                <span>Completed: {MOCK_MILESTONE_PROGRESS.completed} Milestones</span>
-                <span>Remaining: {MOCK_MILESTONE_PROGRESS.total - MOCK_MILESTONE_PROGRESS.completed} Milestones</span>
+                <span>Completed: {profile.completedMilestones} Milestones</span>
+                <span>Remaining: {(profile.totalMilestones || 16) - profile.completedMilestones} Milestones</span>
               </div>
               <div className="w-full h-4 bg-gray-100 border border-gray-200 rounded-full overflow-hidden p-0.5">
                 <div
                   className="h-full rounded-full bg-emerald-500 transition-all duration-1000 shadow-2xs"
-                  style={{ width: `${MOCK_MILESTONE_PROGRESS.percentage}%` }}
+                  style={{ width: `${profile.totalMilestones > 0 ? Math.round((profile.completedMilestones / profile.totalMilestones) * 100) : 0}%` }}
                 />
               </div>
             </div>
 
             <div className="space-y-2 text-xs">
               <span className="text-[10px] font-mono font-bold uppercase text-gray-400 block tracking-wider">
-                Current Target Sprint:
+                Next Milestone Goal:
               </span>
               <div className="p-3.5 rounded-xl bg-emerald-50/70 border border-emerald-200 flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
                   <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
                   <div>
-                    <span className="font-bold text-gray-900 block">Dynamic Programming & Memoization</span>
-                    <span className="text-[10px] text-gray-500">Target: Hard Difficulty • Due Thursday</span>
+                    <span className="font-bold text-gray-900 block">Asymptotic Bounds & Recurrence Relations</span>
+                    <span className="text-[10px] text-gray-500">Target: Easy Difficulty • Ready to Start</span>
                   </div>
                 </div>
-                <span className="px-2 py-0.5 text-[10px] font-mono font-bold bg-emerald-100 text-emerald-950 rounded border border-emerald-300">
-                  IN PROGRESS
-                </span>
+                <a
+                  href="/brain"
+                  className="px-2 py-1 text-[10px] font-mono font-bold bg-emerald-600 text-white rounded border border-emerald-700 hover:bg-emerald-500 transition-colors shadow-2xs"
+                >
+                  START SPRINT
+                </a>
               </div>
             </div>
           </div>
@@ -385,7 +453,12 @@ export default function StudyPulseDashboardPage() {
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
         currentProfile={profile}
-        onProfileUpdated={(updated) => setProfile(updated)}
+        onProfileUpdated={(updated) => {
+          setProfile(updated);
+          const isDemo = updated.isDemoUser || updated.totalFocusHours > 0;
+          setIsDemoDataLoaded(isDemo);
+          setHeatmapData(generateMockHeatmapData(!isDemo));
+        }}
       />
 
     </div>

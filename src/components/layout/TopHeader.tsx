@@ -2,23 +2,17 @@
 
 import React, { useState, useEffect } from "react";
 import { Flame, Bell, Sparkles, GraduationCap, Settings, User } from "lucide-react";
-import { getStudentProfile, StudentProfile, DEFAULT_PROFILE } from "@/lib/userProfile";
+import { getStudentProfile, StudentProfile, NEW_USER_PROFILE } from "@/lib/userProfile";
 import { EditProfileModal } from "@/components/dashboard/EditProfileModal";
 import { NovaLogo } from "@/components/ui/NovaLogo";
 
 interface TopHeaderProps {
   urgentCount?: number;
-  gpa?: number;
-  streakDays?: number;
 }
 
-export function TopHeader({
-  urgentCount = 2,
-  gpa = 3.85,
-  streakDays = 7,
-}: TopHeaderProps) {
+export function TopHeader({ urgentCount = 2 }: TopHeaderProps) {
   const [greeting, setGreeting] = useState("Good evening");
-  const [profile, setProfile] = useState<StudentProfile>(DEFAULT_PROFILE);
+  const [profile, setProfile] = useState<StudentProfile>(NEW_USER_PROFILE);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   useEffect(() => {
@@ -38,11 +32,11 @@ export function TopHeader({
       <header className="w-full py-2.5 sm:py-3.5 px-3 sm:px-8 flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-gray-200 bg-white/95 backdrop-blur-md sticky top-0 z-40 shadow-xs">
         {/* Left Greeting & Official Logo */}
         <div className="flex items-center gap-3">
-          <NovaLogo size="sm" iconOnly={false} href="/dashboard" />
+          <NovaLogo size="md" iconOnly={false} href="/dashboard" />
           
           <div className="border-l border-gray-200 pl-3">
             <div className="flex items-center gap-1.5 text-[9px] sm:text-[10px] font-bold font-mono uppercase tracking-wider text-purple-700 mb-0.5">
-              <Sparkles className="w-3 h-3 text-purple-600 shrink-0" />
+              <Sparkles className="w-3.5 h-3.5 text-purple-600 shrink-0" />
               <span className="truncate max-w-[180px] sm:max-w-none">NOVA • {profile.university}</span>
             </div>
             <h1 className="text-base sm:text-2xl font-bold tracking-tight text-gray-900 flex items-center gap-2 font-serif leading-tight">
@@ -59,13 +53,13 @@ export function TopHeader({
           {/* Streak Counter */}
           <div className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-900 text-[11px] font-bold shadow-xs">
             <Flame className="w-3.5 h-3.5 text-amber-600 fill-amber-500/20" />
-            <span>{streakDays}d Streak</span>
+            <span>{profile.streakDays || 0}d Streak</span>
           </div>
 
           {/* GPA Badge */}
           <div className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-purple-50 border border-purple-200 text-purple-900 text-[11px] font-bold shadow-xs">
             <GraduationCap className="w-3.5 h-3.5 text-purple-600" />
-            <span>GPA: {gpa.toFixed(2)}</span>
+            <span>GPA: {(profile.gpa || 0).toFixed(2)}</span>
           </div>
 
           {/* Edit Profile Settings Button */}
