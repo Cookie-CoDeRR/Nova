@@ -32,7 +32,7 @@ export function GlassCard({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
       className={cn(
-        "rounded-2xl relative overflow-hidden bg-white border shadow-sm transition-all duration-200 text-gray-800",
+        "rounded-2xl relative overflow-hidden bg-white/90 backdrop-blur-md border shadow-sm transition-all duration-200 text-gray-800",
         interactive && "cursor-pointer hover:-translate-y-1 hover:shadow-md",
         colorBorders[glowColor],
         className
