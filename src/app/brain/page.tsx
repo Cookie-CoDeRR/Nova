@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { motion, AnimatePresence } from "framer-motion";
 import { parseSyllabusAction, Milestone } from "@/app/actions/parse-syllabus";
-import { GlassCard } from "@/components/ui/GlassCard";
 import { Sparkles, Brain, Play, Pause, RotateCcw, X, Target, CheckCircle2, BookOpen, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -127,27 +126,30 @@ export default function BrainPage() {
   };
 
   return (
-    <div className="w-full max-w-7xl mx-auto space-y-6 font-sans text-neutral-900">
+    <div className="w-full max-w-7xl mx-auto space-y-8 font-sans text-neutral-800 pb-16">
       
-      {/* Top Title Banner */}
-      <div className="bg-white border border-neutral-200 rounded-2xl p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-[4px_4px_0px_rgba(0,0,0,0.04)]">
-        <div className="flex items-center gap-3">
-          <div className="p-3 rounded-2xl bg-purple-100 border border-purple-200 text-purple-800">
-            <Brain className="w-6 h-6" />
+      {/* Editorial Serif Title Header Banner */}
+      <div className="bg-white border border-neutral-200/80 rounded-2xl p-6 sm:p-8 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="space-y-1">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-50 text-purple-900 border border-purple-200 text-xs font-bold font-mono">
+            <Brain className="w-3.5 h-3.5 text-purple-700" />
+            KNOWLEDGE BASE & ROADMAP SYNTHESIZER
           </div>
-          <div>
-            <h1 className="font-serif text-xl font-bold text-neutral-950 tracking-tight">Syllabus Knowledge Base & Roadmap Synthesizer</h1>
-            <p className="text-xs text-neutral-600">Paste your course syllabus to generate a structured, interactive study roadmap</p>
-          </div>
+          <h1 className="font-serif text-3xl sm:text-4xl font-bold text-neutral-950 tracking-tight">
+            Syllabus Study Roadmap
+          </h1>
+          <p className="text-xs sm:text-sm text-neutral-600">
+            Paste your syllabus to generate interactive, floating flashcard milestones parsed by Gemini 1.5 Pro.
+          </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 shrink-0">
           {SAMPLE_SYLLABI.map((s, idx) => (
             <button
               key={idx}
               type="button"
               onClick={() => setValue("syllabusText", s.text)}
-              className="px-3 py-1.5 rounded-full text-xs font-bold bg-neutral-100 border border-neutral-200 text-neutral-700 hover:text-black hover:bg-neutral-200 transition-colors"
+              className="px-3.5 py-2 rounded-full text-xs font-bold bg-neutral-100 border border-neutral-200/80 text-neutral-700 hover:text-black hover:bg-neutral-200 transition-colors shadow-2xs"
             >
               Load {s.name}
             </button>
@@ -160,11 +162,11 @@ export default function BrainPage() {
         
         {/* Left Half: Input Zone */}
         <div className="flex flex-col h-full space-y-4">
-          <div className="bg-white border border-neutral-200 rounded-2xl p-6 flex-1 flex flex-col justify-between shadow-[4px_4px_0px_rgba(219,234,254,0.7)]">
-            <form onSubmit={handleSubmit(onSubmit)} className="flex-1 flex flex-col justify-between space-y-4">
+          <div className="bg-white border border-neutral-200/80 rounded-2xl p-6 sm:p-8 flex-1 flex flex-col justify-between shadow-sm">
+            <form onSubmit={handleSubmit(onSubmit)} className="flex-1 flex flex-col justify-between space-y-6">
               <div>
-                <label className="text-xs font-bold uppercase font-mono text-purple-800 block mb-2 flex items-center gap-1.5">
-                  <BookOpen className="w-3.5 h-3.5" />
+                <label className="text-xs font-bold uppercase font-mono text-purple-900 block mb-2 flex items-center gap-1.5">
+                  <BookOpen className="w-4 h-4 text-purple-700" />
                   Paste Course Syllabus or Lecture Notes
                 </label>
 
@@ -172,7 +174,7 @@ export default function BrainPage() {
                   {...register("syllabusText", { required: true })}
                   rows={14}
                   placeholder="Paste your course outline, syllabus breakdown, or exam topics here..."
-                  className="w-full bg-neutral-50 border border-neutral-200 rounded-2xl p-4 text-xs font-mono text-neutral-900 placeholder-neutral-400 focus:outline-none focus:border-neutral-400 transition-all resize-none font-medium"
+                  className="w-full bg-neutral-50 border border-neutral-200/80 rounded-2xl p-4 text-xs font-mono text-neutral-900 placeholder-neutral-400 focus:outline-none focus:border-neutral-400 transition-all resize-none font-medium"
                 />
               </div>
 
@@ -180,10 +182,10 @@ export default function BrainPage() {
                 type="submit"
                 disabled={isLoading}
                 className={cn(
-                  "w-full py-3.5 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all duration-200 shadow-md border",
+                  "w-full py-4 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all duration-200 shadow-sm border",
                   isLoading
                     ? "bg-neutral-100 text-neutral-400 border-neutral-200 cursor-wait"
-                    : "bg-black text-white border-black hover:bg-neutral-800 active:scale-[0.99]"
+                    : "bg-neutral-950 text-white border-black hover:bg-neutral-800 active:scale-[0.99]"
                 )}
               >
                 {isLoading ? (
@@ -202,14 +204,14 @@ export default function BrainPage() {
           </div>
         </div>
 
-        {/* Right Half: Vertical Timeline Index Cards Roadmap */}
+        {/* Right Half: Vertical Timeline Interactive Floating Flashcards */}
         <div className="flex flex-col space-y-4">
           <div className="flex items-center justify-between px-2">
-            <h2 className="text-xs font-bold font-mono uppercase text-neutral-500 flex items-center gap-2">
+            <h2 className="text-xs font-bold font-mono uppercase text-neutral-500 flex items-center gap-2 tracking-wider">
               <Target className="w-4 h-4 text-purple-700" />
-              Generated Study Milestones ({milestones.length})
+              Syllabus Study Milestones ({milestones.length})
             </h2>
-            <span className="text-[11px] text-neutral-400 font-mono">Physical Index Cards</span>
+            <span className="text-[10px] text-neutral-400 font-mono">Interactive Flashcards</span>
           </div>
 
           <motion.div
@@ -230,63 +232,63 @@ export default function BrainPage() {
                   className="relative pl-12"
                 >
                   {/* Timeline node dot */}
-                  <div className="absolute left-4 top-5 -translate-x-1/2 w-4 h-4 rounded-full bg-white border-2 border-black shadow-xs z-10" />
+                  <div className="absolute left-4 top-6 -translate-x-1/2 w-4 h-4 rounded-full bg-white border-2 border-black shadow-xs z-10" />
 
-                  {/* Physical Index Card styling with pastel shadows (Hard = Soft Peach/Pink, Medium = Mint Green, Easy = Soft Lavender) */}
+                  {/* Physical Flashcard styling with lift-on-hover & pastel accents */}
                   <div
                     className={cn(
-                      "p-5 rounded-2xl bg-white border border-neutral-200 transition-all duration-200",
+                      "p-6 rounded-2xl bg-white border border-neutral-200/80 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md cursor-pointer",
                       isHard
-                        ? "shadow-[4px_4px_0px_rgba(254,215,170,0.8)]"
+                        ? "border-amber-200/80"
                         : isMedium
-                        ? "shadow-[4px_4px_0px_rgba(187,247,208,0.8)]"
-                        : "shadow-[4px_4px_0px_rgba(233,213,255,0.8)]"
+                        ? "border-emerald-200/80"
+                        : "border-purple-200/80"
                     )}
                   >
-                    <div className="flex items-start justify-between gap-4 mb-3">
+                    <div className="flex items-start justify-between gap-4 mb-4">
                       <div>
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-neutral-100 text-neutral-800 border border-neutral-200">
+                        <div className="flex items-center gap-2 mb-1.5">
+                          <span className="text-[10px] font-mono font-bold px-2.5 py-0.5 rounded bg-neutral-100 text-neutral-800 border border-neutral-200">
                             WEEK {milestone.weekNumber}
                           </span>
 
                           <span
                             className={cn(
-                              "text-[10px] font-bold px-2.5 py-0.5 rounded-full border shadow-2xs font-mono",
+                              "text-[10px] font-bold px-2.5 py-0.5 rounded-full border font-mono",
                               isHard
-                                ? "bg-pink-100 text-pink-900 border-pink-300"
+                                ? "bg-amber-50 text-amber-900 border-amber-200"
                                 : isMedium
-                                ? "bg-emerald-100 text-emerald-900 border-emerald-300"
-                                : "bg-purple-100 text-purple-900 border-purple-300"
+                                ? "bg-emerald-50 text-emerald-900 border-emerald-200"
+                                : "bg-purple-50 text-purple-900 border-purple-200"
                             )}
                           >
                             {milestone.difficulty} Difficulty
                           </span>
                         </div>
 
-                        <h3 className="font-serif text-base font-bold text-neutral-950 tracking-tight">
+                        <h3 className="font-serif text-lg font-bold text-neutral-950 tracking-tight">
                           {milestone.topic}
                         </h3>
                       </div>
 
                       <button
                         onClick={() => startFocusSession(milestone)}
-                        className="px-3.5 py-1.5 rounded-full text-xs font-bold bg-neutral-900 text-white hover:bg-neutral-800 transition-all duration-200 flex items-center gap-1.5 shrink-0 shadow-sm"
+                        className="px-4 py-2 rounded-full text-xs font-bold bg-neutral-950 text-white hover:bg-neutral-800 transition-all duration-200 flex items-center gap-1.5 shrink-0 shadow-sm"
                       >
                         <Play className="w-3.5 h-3.5 fill-current text-white" />
-                        Start Focus Session
+                        Start Focus
                       </button>
                     </div>
 
                     {/* Key Concepts */}
-                    <div className="pt-2 border-t border-neutral-100 flex items-center gap-1.5 flex-wrap">
-                      <span className="text-[10px] font-mono font-bold text-neutral-400 uppercase mr-1">
-                        Key Concepts:
+                    <div className="pt-3 border-t border-neutral-100 flex items-center gap-1.5 flex-wrap">
+                      <span className="text-[10px] font-mono font-bold text-neutral-400 uppercase tracking-wider mr-1">
+                        Concepts:
                       </span>
                       {milestone.keyConcepts.map((concept, idx) => (
                         <span
                           key={idx}
-                          className="px-2.5 py-1 rounded-md text-xs font-medium bg-neutral-50 text-neutral-800 border border-neutral-200"
+                          className="px-3 py-1 rounded-lg text-xs font-medium bg-neutral-50 text-neutral-800 border border-neutral-200/80"
                         >
                           {concept}
                         </span>
@@ -314,7 +316,7 @@ export default function BrainPage() {
               layoutId={`milestone-${activeFocusMilestone.weekNumber}`}
               className="w-full max-w-lg"
             >
-              <div className="p-8 bg-white border border-neutral-200 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] relative font-sans text-neutral-900">
+              <div className="p-8 bg-white border border-neutral-200/80 rounded-2xl shadow-xl relative font-sans text-neutral-900">
                 <button
                   onClick={closeFocusSession}
                   className="absolute top-4 right-4 p-2 rounded-full bg-neutral-100 border border-neutral-200 text-neutral-500 hover:text-black"
@@ -323,10 +325,10 @@ export default function BrainPage() {
                 </button>
 
                 <div className="text-center mb-6">
-                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-100 border border-purple-200 text-purple-900 text-xs font-bold mb-2 font-mono">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-50 border border-purple-200 text-purple-900 text-xs font-bold mb-2 font-mono">
                     WEEK {activeFocusMilestone.weekNumber} • {activeFocusMilestone.difficulty} MODE
                   </div>
-                  <h2 className="font-serif text-xl font-bold text-neutral-950 tracking-tight">
+                  <h2 className="font-serif text-2xl font-bold text-neutral-950 tracking-tight">
                     {activeFocusMilestone.topic}
                   </h2>
                 </div>
@@ -352,8 +354,8 @@ export default function BrainPage() {
                     <span className="text-5xl font-black font-mono tracking-tighter text-neutral-950">
                       {formatTime(timerSeconds)}
                     </span>
-                    <span className="text-xs font-bold text-purple-700 uppercase tracking-widest mt-1 font-mono">
-                      {isTimerRunning ? "Deep Study In Progress" : "Session Paused"}
+                    <span className="text-xs font-bold text-purple-800 uppercase tracking-widest mt-1 font-mono">
+                      {isTimerRunning ? "Deep Study Active" : "Session Paused"}
                     </span>
                   </div>
                 </div>
@@ -371,7 +373,7 @@ export default function BrainPage() {
 
                   <button
                     onClick={() => setIsTimerRunning(!isTimerRunning)}
-                    className="px-8 py-3.5 rounded-full font-bold text-sm bg-black text-white shadow-sm flex items-center gap-2 hover:bg-neutral-800"
+                    className="px-8 py-3.5 rounded-full font-bold text-sm bg-neutral-950 text-white shadow-sm flex items-center gap-2 hover:bg-neutral-800"
                   >
                     {isTimerRunning ? (
                       <>
@@ -389,13 +391,13 @@ export default function BrainPage() {
 
                 <div className="pt-4 border-t border-neutral-100">
                   <span className="text-xs font-bold uppercase font-mono text-neutral-500 block mb-2 text-center">
-                    Session Focus Concepts to Master:
+                    Concepts to Master:
                   </span>
                   <div className="flex flex-wrap items-center justify-center gap-2">
                     {activeFocusMilestone.keyConcepts.map((concept, idx) => (
                       <div
                         key={idx}
-                        className="px-3 py-1.5 rounded-xl bg-neutral-50 border border-neutral-200 text-xs font-medium text-neutral-800 flex items-center gap-1.5"
+                        className="px-3 py-1.5 rounded-xl bg-neutral-50 border border-neutral-200/80 text-xs font-medium text-neutral-800 flex items-center gap-1.5"
                       >
                         <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
                         {concept}
