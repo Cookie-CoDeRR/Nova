@@ -4,7 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
-import { LayoutDashboard, Sparkles, Brain, Target, BarChart2 } from "lucide-react";
+import { Sparkles, Brain, Target, BarChart2 } from "lucide-react";
 import { NovaLogo } from "@/components/ui/NovaLogo";
 import { cn } from "@/lib/utils";
 
@@ -16,27 +16,22 @@ interface FloatingNavProps {
 export function FloatingNav({ onToggleFocusMode, isFocusModeActive }: FloatingNavProps) {
   const pathname = usePathname();
 
+  // Floating Navigation Items for Main App Only
   const navItems = [
     {
-      name: "Home",
-      href: "/",
-      icon: LayoutDashboard,
-      badge: null,
-    },
-    {
-      name: "Pulse",
+      name: "Study Pulse",
       href: "/dashboard",
       icon: BarChart2,
       badge: null,
     },
     {
-      name: "Tutor",
+      name: "Socratic AI Tutor",
       href: "/tutor",
       icon: Sparkles,
       badge: "AI",
     },
     {
-      name: "Knowledge",
+      name: "Knowledge Base",
       href: "/brain",
       icon: Brain,
       badge: null,
@@ -49,15 +44,15 @@ export function FloatingNav({ onToggleFocusMode, isFocusModeActive }: FloatingNa
         initial={{ y: 50, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-        className="glass-pill px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full flex items-center gap-1 sm:gap-2 border border-gray-200 shadow-lg bg-white/95 backdrop-blur-md"
+        className="glass-pill px-3 sm:px-4 py-1.5 sm:py-2 rounded-full flex items-center gap-1.5 sm:gap-2 border border-gray-200 shadow-lg bg-white/95 backdrop-blur-md"
       >
-        {/* Official Brand Logo (Cropped & Sharp) */}
+        {/* Official Brand Logo (Points to /dashboard inside app) */}
         <div className="pr-1.5 sm:pr-3 border-r border-gray-200 shrink-0">
-          <NovaLogo size="sm" iconOnly={true} href="/" />
+          <NovaLogo size="sm" iconOnly={true} href="/dashboard" />
         </div>
 
         {/* Navigation Items */}
-        <div className="flex items-center gap-0.5 sm:gap-1">
+        <div className="flex items-center gap-1 sm:gap-1.5">
           {navItems.map((item) => {
             const isActive = pathname === item.href;
             const Icon = item.icon;
@@ -67,7 +62,7 @@ export function FloatingNav({ onToggleFocusMode, isFocusModeActive }: FloatingNa
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "relative flex items-center gap-1 sm:gap-2 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-full text-[11px] sm:text-xs font-medium transition-all duration-200 shrink-0",
+                  "relative flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs font-medium transition-all duration-200 shrink-0",
                   isActive
                     ? "text-gray-900 font-bold"
                     : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
@@ -81,9 +76,9 @@ export function FloatingNav({ onToggleFocusMode, isFocusModeActive }: FloatingNa
                   />
                 )}
                 <Icon className={cn("w-3.5 h-3.5 sm:w-4 sm:h-4 z-10 shrink-0", isActive ? "text-purple-700" : "text-gray-500")} />
-                <span className="z-10 hidden xs:inline sm:inline">{item.name}</span>
+                <span className="z-10">{item.name}</span>
                 {item.badge && (
-                  <span className="z-10 px-1 py-0.2 text-[8px] sm:text-[9px] font-bold rounded-full bg-purple-100 text-purple-800 border border-purple-200 hidden md:inline-block">
+                  <span className="z-10 px-1.5 py-0.2 text-[8px] sm:text-[9px] font-bold rounded-full bg-purple-100 text-purple-800 border border-purple-200 hidden md:inline-block">
                     {item.badge}
                   </span>
                 )}
@@ -94,11 +89,11 @@ export function FloatingNav({ onToggleFocusMode, isFocusModeActive }: FloatingNa
 
         {/* Focus Mode Quick Action Button */}
         {onToggleFocusMode && (
-          <div className="pl-1 sm:pl-2 border-l border-gray-200 flex items-center gap-1 shrink-0">
+          <div className="pl-1.5 sm:pl-2 border-l border-gray-200 flex items-center gap-1 shrink-0">
             <button
               onClick={onToggleFocusMode}
               className={cn(
-                "flex items-center gap-1 px-2.5 sm:px-3 py-1.5 rounded-full text-[11px] sm:text-xs font-bold transition-all duration-300 border cursor-pointer",
+                "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all duration-300 border cursor-pointer",
                 isFocusModeActive
                   ? "bg-amber-100 text-amber-900 border-amber-300 shadow-sm animate-pulse"
                   : "bg-gray-100 text-gray-700 border-gray-200 hover:bg-gray-200"

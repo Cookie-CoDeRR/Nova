@@ -1,10 +1,12 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Flame, Bell, Sparkles, GraduationCap, Settings, User } from "lucide-react";
+import { Flame, Bell, Sparkles, GraduationCap, Settings, LogOut } from "lucide-react";
 import { getStudentProfile, StudentProfile, NEW_USER_PROFILE } from "@/lib/userProfile";
 import { EditProfileModal } from "@/components/dashboard/EditProfileModal";
 import { NovaLogo } from "@/components/ui/NovaLogo";
+import { auth } from "@/lib/firebase";
+import { signOut } from "firebase/auth";
 
 interface TopHeaderProps {
   urgentCount?: number;
@@ -26,6 +28,19 @@ export function TopHeader({ urgentCount = 2 }: TopHeaderProps) {
       setProfile(p);
     });
   }, []);
+
+  const handleSignOut = async () => {
+    try {
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("nova_student_profile");
+      }
+      await signOut(auth);
+    } catch (e) {
+      console.warn("Signout warning:", e);
+    } finally {
+      window.location.href = "/";
+    }
+  };
 
   return (
     <>
@@ -80,6 +95,16 @@ export function TopHeader({ urgentCount = 2 }: TopHeaderProps) {
             <Bell className="w-3.5 h-3.5" />
             <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-purple-600 animate-ping" />
             <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-purple-600" />
+          </button>
+
+          {/* Sign Out Button */}
+          <button
+            onClick={handleSignOut}
+            className="p-1.5 sm:p-2 rounded-full bg-red-50 border border-red-200 text-red-700 hover:bg-red-100 transition-colors flex items-center gap-1 text-xs font-bold sm:px-2.5 cursor-pointer"
+            title="Sign Out to Landing Page"
+          >
+            <LogOut className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Sign Out</span>
           </button>
 
           {/* Student Avatar */}

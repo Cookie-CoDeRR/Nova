@@ -5,8 +5,6 @@ import "./globals.css";
 import { GlowBackground } from "@/components/ui/GlowBackground";
 import { FloatingNav } from "@/components/layout/FloatingNav";
 import { TopHeader } from "@/components/layout/TopHeader";
-import { PomodoroTimer } from "@/components/dashboard/PomodoroTimer";
-import { AnimatePresence } from "framer-motion";
 import { usePathname } from "next/navigation";
 
 export default function RootLayout({
@@ -17,8 +15,8 @@ export default function RootLayout({
   const [isFocusModeActive, setIsFocusModeActive] = useState(false);
   const pathname = usePathname();
 
-  const isAuthPage = pathname === "/auth";
-  const isLandingPage = pathname === "/";
+  // FloatingNav and TopHeader should ONLY render inside the main authenticated app routes
+  const isMainAppRoute = pathname === "/dashboard" || pathname === "/tutor" || pathname === "/brain";
 
   return (
     <html lang="en">
@@ -30,18 +28,18 @@ export default function RootLayout({
         {/* Faint Dot Grid Background */}
         <GlowBackground />
 
-        {/* Global Light Top Header */}
-        {!isAuthPage && !isLandingPage && (
-          <TopHeader urgentCount={2} studentName="Alex" gpa={3.85} streakDays={7} />
+        {/* Global Light Top Header (Main App Only) */}
+        {isMainAppRoute && (
+          <TopHeader urgentCount={2} />
         )}
 
         {/* Main Content Viewport */}
-        <main className={isAuthPage || isLandingPage ? "relative z-10" : "relative z-10 pb-28 pt-4 px-4 sm:px-8 max-w-7xl mx-auto min-h-[calc(100vh-160px)]"}>
+        <main className={isMainAppRoute ? "relative z-10 pb-28 pt-4 px-4 sm:px-8 max-w-7xl mx-auto min-h-[calc(100vh-160px)]" : "relative z-10"}>
           {children}
         </main>
 
-        {/* Floating Glass Pill Navigation */}
-        {!isAuthPage && (
+        {/* Floating Glass Pill Navigation (Main App Only) */}
+        {isMainAppRoute && (
           <FloatingNav
             isFocusModeActive={isFocusModeActive}
             onToggleFocusMode={() => setIsFocusModeActive((prev) => !prev)}
