@@ -24,16 +24,16 @@ export function FloatingNav({ onToggleFocusMode, isFocusModeActive }: FloatingNa
       badge: null,
     },
     {
-      name: "Study Pulse",
+      name: "Pulse",
       href: "/dashboard",
       icon: BarChart2,
-      badge: "Pulse",
+      badge: null,
     },
     {
-      name: "AI Tutor",
+      name: "Tutor",
       href: "/tutor",
       icon: Sparkles,
-      badge: "Socratic",
+      badge: "AI",
     },
     {
       name: "Knowledge",
@@ -44,20 +44,20 @@ export function FloatingNav({ onToggleFocusMode, isFocusModeActive }: FloatingNa
   ];
 
   return (
-    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-auto max-w-[95vw]">
+    <div className="fixed bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-50 w-auto max-w-[98vw]">
       <motion.nav
         initial={{ y: 50, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-        className="glass-pill px-4 py-2 rounded-full flex items-center gap-2 border border-gray-200 shadow-md bg-white/95 backdrop-blur-md"
+        className="glass-pill px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full flex items-center gap-1 sm:gap-2 border border-gray-200 shadow-lg bg-white/95 backdrop-blur-md"
       >
         {/* Official Brand Logo (Cropped & Sharp) */}
-        <div className="pr-3 border-r border-gray-200">
-          <NovaLogo size="sm" iconOnly={false} href="/" />
+        <div className="pr-1.5 sm:pr-3 border-r border-gray-200 shrink-0">
+          <NovaLogo size="sm" iconOnly={true} href="/" />
         </div>
 
         {/* Navigation Items */}
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-0.5 sm:gap-1">
           {navItems.map((item) => {
             const isActive = pathname === item.href;
             const Icon = item.icon;
@@ -67,7 +67,7 @@ export function FloatingNav({ onToggleFocusMode, isFocusModeActive }: FloatingNa
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "relative flex items-center gap-2 px-3.5 py-2 rounded-full text-xs font-medium transition-all duration-200",
+                  "relative flex items-center gap-1 sm:gap-2 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-full text-[11px] sm:text-xs font-medium transition-all duration-200 shrink-0",
                   isActive
                     ? "text-gray-900 font-bold"
                     : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
@@ -80,10 +80,10 @@ export function FloatingNav({ onToggleFocusMode, isFocusModeActive }: FloatingNa
                     transition={{ type: "spring", stiffness: 400, damping: 30 }}
                   />
                 )}
-                <Icon className={cn("w-4 h-4 z-10", isActive ? "text-purple-700" : "text-gray-500")} />
-                <span className="z-10">{item.name}</span>
+                <Icon className={cn("w-3.5 h-3.5 sm:w-4 sm:h-4 z-10 shrink-0", isActive ? "text-purple-700" : "text-gray-500")} />
+                <span className="z-10 hidden xs:inline sm:inline">{item.name}</span>
                 {item.badge && (
-                  <span className="z-10 px-1.5 py-0.5 text-[9px] font-bold rounded-full bg-purple-100 text-purple-800 border border-purple-200 hidden md:inline-block">
+                  <span className="z-10 px-1 py-0.2 text-[8px] sm:text-[9px] font-bold rounded-full bg-purple-100 text-purple-800 border border-purple-200 hidden md:inline-block">
                     {item.badge}
                   </span>
                 )}
@@ -94,11 +94,11 @@ export function FloatingNav({ onToggleFocusMode, isFocusModeActive }: FloatingNa
 
         {/* Focus Mode Quick Action Button */}
         {onToggleFocusMode && (
-          <div className="pl-2 border-l border-gray-200 flex items-center gap-2">
+          <div className="pl-1 sm:pl-2 border-l border-gray-200 flex items-center gap-1 shrink-0">
             <button
               onClick={onToggleFocusMode}
               className={cn(
-                "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all duration-300 border cursor-pointer",
+                "flex items-center gap-1 px-2.5 sm:px-3 py-1.5 rounded-full text-[11px] sm:text-xs font-bold transition-all duration-300 border cursor-pointer",
                 isFocusModeActive
                   ? "bg-amber-100 text-amber-900 border-amber-300 shadow-sm animate-pulse"
                   : "bg-gray-100 text-gray-700 border-gray-200 hover:bg-gray-200"

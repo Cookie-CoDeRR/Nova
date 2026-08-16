@@ -35,43 +35,43 @@ export function TopHeader({
 
   return (
     <>
-      <header className="w-full py-3.5 px-4 sm:px-8 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-200 bg-white/90 backdrop-blur-md sticky top-0 z-40 shadow-xs">
+      <header className="w-full py-2.5 sm:py-3.5 px-3 sm:px-8 flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-gray-200 bg-white/95 backdrop-blur-md sticky top-0 z-40 shadow-xs">
         {/* Left Greeting & Official Logo */}
-        <div className="flex items-center gap-4">
-          <NovaLogo size="md" iconOnly={false} href="/dashboard" />
+        <div className="flex items-center gap-3">
+          <NovaLogo size="sm" iconOnly={false} href="/dashboard" />
           
-          <div className="border-l border-gray-200 pl-4">
-            <div className="flex items-center gap-2 text-[10px] font-bold font-mono uppercase tracking-wider text-purple-700 mb-0.5">
-              <Sparkles className="w-3.5 h-3.5 text-purple-600" />
-              <span>NOVA Digital Workspace • {profile.university}</span>
+          <div className="border-l border-gray-200 pl-3">
+            <div className="flex items-center gap-1.5 text-[9px] sm:text-[10px] font-bold font-mono uppercase tracking-wider text-purple-700 mb-0.5">
+              <Sparkles className="w-3 h-3 text-purple-600 shrink-0" />
+              <span className="truncate max-w-[180px] sm:max-w-none">NOVA • {profile.university}</span>
             </div>
-            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-gray-900 flex items-center gap-2 font-serif">
+            <h1 className="text-base sm:text-2xl font-bold tracking-tight text-gray-900 flex items-center gap-2 font-serif leading-tight">
               <span>{greeting}, {profile.displayName.split(" ")[0]}.</span>
             </h1>
-            <p className="text-xs text-gray-600 mt-0.5">
+            <p className="text-[11px] sm:text-xs text-gray-600 mt-0.5 hidden sm:block">
               <span className="font-semibold text-gray-800">{profile.currentYear}</span> • ID: <span className="font-mono text-gray-800">{profile.rollNumber}</span>
             </p>
           </div>
         </div>
 
         {/* Right Student Quick Stats, Badges & Profile Modal Trigger */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3 self-end md:self-auto">
           {/* Streak Counter */}
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-50 border border-amber-200 text-amber-900 text-xs font-bold shadow-xs">
-            <Flame className="w-4 h-4 text-amber-600 fill-amber-500/20" />
-            <span>{streakDays} Day Streak</span>
+          <div className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-900 text-[11px] font-bold shadow-xs">
+            <Flame className="w-3.5 h-3.5 text-amber-600 fill-amber-500/20" />
+            <span>{streakDays}d Streak</span>
           </div>
 
           {/* GPA Badge */}
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-purple-50 border border-purple-200 text-purple-900 text-xs font-bold shadow-xs">
-            <GraduationCap className="w-4 h-4 text-purple-600" />
+          <div className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-purple-50 border border-purple-200 text-purple-900 text-[11px] font-bold shadow-xs">
+            <GraduationCap className="w-3.5 h-3.5 text-purple-600" />
             <span>GPA: {gpa.toFixed(2)}</span>
           </div>
 
           {/* Edit Profile Settings Button */}
           <button
             onClick={() => setIsEditModalOpen(true)}
-            className="p-2 rounded-full bg-gray-100 border border-gray-200 text-gray-700 hover:text-gray-900 hover:bg-gray-200 transition-colors flex items-center gap-1 text-xs font-bold px-3 cursor-pointer"
+            className="p-1.5 sm:p-2 rounded-full bg-gray-100 border border-gray-200 text-gray-700 hover:text-gray-900 hover:bg-gray-200 transition-colors flex items-center gap-1 text-xs font-bold sm:px-3 cursor-pointer"
             title="Edit Profile & Specialization"
           >
             <Settings className="w-3.5 h-3.5 text-gray-600" />
@@ -80,10 +80,10 @@ export function TopHeader({
 
           {/* Notification Bell */}
           <button 
-            className="relative p-2 rounded-full bg-gray-100 border border-gray-200 text-gray-700 hover:text-gray-900 hover:bg-gray-200 transition-colors"
+            className="relative p-1.5 sm:p-2 rounded-full bg-gray-100 border border-gray-200 text-gray-700 hover:text-gray-900 hover:bg-gray-200 transition-colors"
             title="Notifications"
           >
-            <Bell className="w-4 h-4" />
+            <Bell className="w-3.5 h-3.5" />
             <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-purple-600 animate-ping" />
             <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-purple-600" />
           </button>
@@ -91,10 +91,10 @@ export function TopHeader({
           {/* Student Avatar */}
           <div 
             onClick={() => setIsEditModalOpen(true)}
-            className="flex items-center gap-2 pl-2 border-l border-gray-200 cursor-pointer"
+            className="flex items-center gap-2 pl-1.5 border-l border-gray-200 cursor-pointer"
             title="Click to edit profile"
           >
-            <div className="w-9 h-9 rounded-full bg-gray-900 flex items-center justify-center font-bold text-xs text-white shadow-xs hover:scale-105 transition-transform">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gray-900 flex items-center justify-center font-bold text-xs text-white shadow-xs hover:scale-105 transition-transform">
               {profile.displayName.charAt(0)}
             </div>
           </div>

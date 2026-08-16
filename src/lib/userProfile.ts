@@ -1,5 +1,5 @@
 import { db, auth } from "@/lib/firebase";
-import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 
 export interface StudentProfile {
   uid?: string;
@@ -21,7 +21,7 @@ export const DEFAULT_PROFILE: StudentProfile = {
   university: "IIT Bombay",
   currentYear: "3rd Year Computer Science and Engineering",
   rollNumber: "2023CSB1042",
-  specializations: ["Full-Stack Development", "AI / Machine Learning", "Data Structures & Algorithms"],
+  specializations: ["Full-Stack Web Development", "AI / Machine Learning", "Data Structures & Algorithms"],
   primaryGoal: "Master Advanced Socratic Concepts & Complete Course Milestones",
   onboarded: true,
 };
@@ -42,26 +42,38 @@ export async function saveStudentProfile(profile: Partial<StudentProfile>): Prom
     updatedAt: new Date().toISOString(),
   };
 
-  // 1. Save to LocalStorage for instant reactive client UI
+  // 1. Synchronously save to LocalStorage for instant zero-latency client UI & routing
   if (typeof window !== "undefined") {
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updatedProfile));
+    try {
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updatedProfile));
+    } catch (e) {
+      console.warn("LocalStorage save warning:", e);
+    }
   }
 
-  // 2. Persist to Firestore document (users/{uid})
-  try {
-    if (user) {
-      const userRef = doc(db, "users", uid);
-      await setDoc(userRef, updatedProfile, { merge: true });
-    }
-  } catch (err) {
-    console.warn("Firestore profile save fallback to local storage:", err);
+  // 2. Non-blocking async firestore save with 1.2s timeout race
+  if (user && db) {
+    const firestoreSave = async () => {
+      try {
+        const userRef = doc(db, "users", uid);
+        await setDoc(userRef, updatedProfile, { merge: true });
+      } catch (err) {
+        console.warn("Firestore profile sync warning:", err);
+      }
+    };
+
+    // Race firestore save with 1.2s timeout so the UI never blocks or gets stuck
+    await Promise.race([
+      firestoreSave(),
+      new Promise((resolve) => setTimeout(resolve, 1200)),
+    ]);
   }
 
   return updatedProfile;
 }
 
 export async function getStudentProfile(): Promise<StudentProfile> {
-  // 1. Check local storage first
+  // 1. Check local storage first for instant zero-latency load
   if (typeof window !== "undefined") {
     const cached = localStorage.getItem(LOCAL_STORAGE_KEY);
     if (cached) {
@@ -73,9 +85,9 @@ export async function getStudentProfile(): Promise<StudentProfile> {
     }
   }
 
-  // 2. Check Firestore
+  // 2. Check Firestore if authenticated
   const user = auth.currentUser;
-  if (user) {
+  if (user && db) {
     try {
       const userRef = doc(db, "users", user.uid);
       const snap = await getDoc(userRef);
