@@ -1,12 +1,14 @@
 import { NextResponse } from "next/server";
 import { GoogleGenAI } from "@google/genai";
 
-const apiKey = process.env.GEMINI_API_KEY;
-
 const SOCRATIC_SYSTEM_PROMPT = `You are NOVA, an elite academic AI tutor. Your strict rule is NEVER to give the student the direct answer to a homework question or math problem. Instead, use the Socratic method. Ask leading questions, break the concept down into smaller fundamental principles, and guide the student to discover the answer themselves. Keep responses concise. Use markdown.`;
 
 export async function POST(req: Request) {
   try {
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey || apiKey.trim() === "") {
+      console.warn("GEMINI_API_KEY is not defined in environment variables. Falling back to built-in Socratic stream engine.");
+    }
     const body = await req.json();
     const { messages, prompt, courseContext } = body;
 
