@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import { auth, googleProvider } from "@/lib/firebase";
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import { Sparkles, ArrowRight, Lock, Mail, Check, LogIn, UserPlus } from "lucide-react";
-import { GlassCard } from "@/components/ui/GlassCard";
+import { GlobalNotebookBg } from "@/components/ui/GlobalNotebookBg";
 import { cn } from "@/lib/utils";
 
 export default function AuthPage() {
@@ -70,37 +70,34 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="min-h-screen w-full bg-[#FAFAFA] text-neutral-900 flex flex-col justify-center items-center p-4 relative overflow-hidden font-sans">
+    <div className="min-h-screen w-full bg-[#FAFAFA] text-gray-800 flex flex-col justify-center items-center p-4 relative overflow-hidden font-sans">
       
-      {/* Ambient Dot Grid Pattern */}
-      <div 
-        className="fixed inset-0 pointer-events-none opacity-40 z-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px]"
-        aria-hidden="true"
-      />
+      {/* Global Scroll-Aware & Idle-Breathing Floating Notebook Background */}
+      <GlobalNotebookBg />
 
       {/* Brand Link */}
       <Link href="/" className="absolute top-8 left-8 flex items-center gap-2 z-20 hover:opacity-80 transition-opacity">
         <div className="w-8 h-8 rounded-lg bg-gray-900 flex items-center justify-center font-bold text-xs text-white shadow-xs">
           N
         </div>
-        <span className="font-extrabold text-sm tracking-wider text-gray-900">NOVA SANCTUARY</span>
+        <span className="font-extrabold text-sm tracking-wider text-gray-900 font-sans">NOVA SANCTUARY</span>
       </Link>
 
-      {/* Auth Modal Card */}
+      {/* Auth Card Container */}
       <motion.div
         initial={{ opacity: 0, y: 20, scale: 0.96 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
         className="w-full max-w-md z-10"
       >
-        <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-[0_10px_30px_rgba(0,0,0,0.06),4px_4px_0px_rgba(233,213,255,0.7)] relative overflow-hidden">
+        <div className="bg-white/90 backdrop-blur-md border border-gray-200 shadow-xl rounded-3xl p-8 relative overflow-hidden">
           
           <div className="text-center mb-6">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-100 border border-purple-200 text-purple-800 text-xs font-bold mb-3 font-mono">
               <Sparkles className="w-3.5 h-3.5 text-purple-600" />
               Firebase Auth Portal
             </div>
-            <h1 className="text-2xl font-black text-gray-900 tracking-tight font-sans">
+            <h1 className="text-2xl font-black text-gray-900 tracking-tight font-serif">
               {tab === "LOGIN" ? "Welcome Back to NOVA" : "Join Your Academic Sanctuary"}
             </h1>
             <p className="text-xs text-gray-500 mt-1">
@@ -123,10 +120,11 @@ export default function AuthPage() {
             </button>
           </div>
 
+          {/* Google Auth Button */}
           <button
             onClick={handleGoogleAuth}
             disabled={loading}
-            className="w-full py-3 rounded-xl bg-gray-50 border border-gray-200 hover:bg-gray-100 text-xs font-bold text-gray-900 transition-all duration-200 flex items-center justify-center gap-3 shadow-2xs mb-5"
+            className="w-full py-3 rounded-xl bg-white border border-gray-200 hover:bg-gray-50 text-xs font-bold text-gray-900 transition-all duration-200 flex items-center justify-center gap-3 shadow-xs mb-5 cursor-pointer"
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24">
               <path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.6l3.1-3.1C17.3 1.7 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7.3 9 5 12 5z" />
@@ -175,7 +173,7 @@ export default function AuthPage() {
 
             <button
               type="submit" disabled={loading}
-              className="w-full py-3 rounded-xl font-bold text-xs bg-gray-900 text-white hover:bg-gray-800 transition-all flex items-center justify-center gap-2 mt-2 shadow-xs"
+              className="w-full py-3 rounded-xl font-bold text-xs bg-gray-900 text-white hover:bg-gray-800 transition-all flex items-center justify-center gap-2 mt-2 shadow-xs cursor-pointer"
             >
               {loading ? "Connecting to Firebase..." : tab === "LOGIN" ? "Sign In with Firebase" : "Create Firebase Account"}
               <ArrowRight className="w-4 h-4" />
