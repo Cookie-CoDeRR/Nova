@@ -51,9 +51,9 @@ export function FloatingNav({ onToggleFocusMode, isFocusModeActive }: FloatingNa
         transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
         className="glass-pill px-4 py-2 rounded-full flex items-center gap-2 border border-gray-200 shadow-md bg-white/95 backdrop-blur-md"
       >
-        {/* Official Brand Logo */}
+        {/* Official Brand Logo (Cropped & Sharp) */}
         <div className="pr-3 border-r border-gray-200">
-          <NovaLogo size="sm" showText={true} href="/" />
+          <NovaLogo size="sm" iconOnly={false} href="/" />
         </div>
 
         {/* Navigation Items */}

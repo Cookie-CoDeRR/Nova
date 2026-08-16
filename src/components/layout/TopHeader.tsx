@@ -38,9 +38,9 @@ export function TopHeader({
       <header className="w-full py-3.5 px-4 sm:px-8 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-200 bg-white/90 backdrop-blur-md sticky top-0 z-40 shadow-xs">
         {/* Left Greeting & Official Logo */}
         <div className="flex items-center gap-4">
-          <NovaLogo size="md" showText={false} href="/dashboard" />
+          <NovaLogo size="md" iconOnly={false} href="/dashboard" />
           
-          <div>
+          <div className="border-l border-gray-200 pl-4">
             <div className="flex items-center gap-2 text-[10px] font-bold font-mono uppercase tracking-wider text-purple-700 mb-0.5">
               <Sparkles className="w-3.5 h-3.5 text-purple-600" />
               <span>NOVA Digital Workspace • {profile.university}</span>
