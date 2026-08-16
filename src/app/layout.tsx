@@ -21,13 +21,13 @@ export default function RootLayout({
   const isLandingPage = pathname === "/";
 
   return (
-    <html lang="en" className="dark">
+    <html lang="en">
       <head>
         <title>NOVA | AI Student Personalised Assistant</title>
         <meta name="description" content="Proactive digital companion for university students with Socratic AI tutoring, syllabus knowledge base, and focus management." />
       </head>
-      <body className="bg-black text-neutral-300 min-h-screen relative antialiased selection:bg-purple-600 selection:text-white">
-        {/* Ambient Glowing Mesh Background */}
+      <body className="bg-[#FAFAFA] text-neutral-900 min-h-screen relative antialiased selection:bg-purple-600 selection:text-white">
+        {/* Ambient Dot Grid Background */}
         <GlowBackground />
 
         {/* Global Header */}
