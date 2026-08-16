@@ -7,6 +7,7 @@ import { CourseSelector, SAMPLE_COURSES } from "./CourseSelector";
 import { ChatMessage } from "@/types";
 import { Send, Sparkles, Bot, User, Trash2 } from "lucide-react";
 import { motion } from "framer-motion";
+import { getStudentProfile, StudentProfile, NEW_USER_PROFILE } from "@/lib/userProfile";
 import { cn } from "@/lib/utils";
 
 const INITIAL_MESSAGES: ChatMessage[] = [
@@ -15,7 +16,7 @@ const INITIAL_MESSAGES: ChatMessage[] = [
     role: "assistant",
     message: `Greetings! I am **NOVA**, your Personal Socratic AI Companion. 🎓
 
-I am configured to guide you through complex engineering concepts, homework, and derivations. Instead of giving away direct answers, I will ask leading questions and break down principles step-by-step.
+Ask me any direct academic question (e.g. *"What is the powerhouse of the cell?"* or *"What is Dijkstra's algorithm?"*). I will provide a direct 1-2 sentence explanation first, followed by a Socratic challenge tailored to your background.
 
 How can I help you master your coursework today?`,
     timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
@@ -27,11 +28,16 @@ export function ChatInterface() {
   const [inputPrompt, setInputPrompt] = useState("");
   const [selectedCourseId, setSelectedCourseId] = useState("all");
   const [isLoading, setIsLoading] = useState(false);
+  const [studentProfile, setStudentProfile] = useState<StudentProfile>(NEW_USER_PROFILE);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
+
+  useEffect(() => {
+    getStudentProfile().then((p) => setStudentProfile(p));
+  }, []);
 
   useEffect(() => {
     scrollToBottom();
@@ -65,6 +71,7 @@ export function ChatInterface() {
           prompt: query.trim(),
           courseContext: courseName,
           history: updatedMessages.slice(-10).map((m) => ({ role: m.role, message: m.message })),
+          studentProfile,
         }),
       });
 
@@ -116,7 +123,9 @@ export function ChatInterface() {
                 Gemini 2.5 Flash
               </span>
             </div>
-            <p className="text-xs text-gray-600">Guided step-by-step interactive learning</p>
+            <p className="text-xs text-gray-600">
+              Direct Answer + Socratic Challenge • Tailored for {studentProfile.displayName.split(" ")[0]} ({studentProfile.university})
+            </p>
           </div>
         </div>
 
@@ -193,7 +202,7 @@ export function ChatInterface() {
             </div>
             <div className="p-4 rounded-2xl rounded-tl-none bg-white border border-gray-200 border-l-4 border-l-purple-600 flex items-center gap-2 text-xs text-purple-900 font-medium shadow-xs">
               <Sparkles className="w-4 h-4 animate-pulse text-purple-600" />
-              <span>NOVA is formulating a Socratic response...</span>
+              <span>NOVA is formulating a direct answer & Socratic challenge...</span>
             </div>
           </motion.div>
         )}
@@ -213,7 +222,7 @@ export function ChatInterface() {
             value={inputPrompt}
             onChange={(e) => setInputPrompt(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Ask NOVA anything... (Press Enter to send, Shift+Enter for new line)"
+            placeholder="Ask NOVA any direct question... (e.g. 'What is mitochondria?' or 'What is Dijkstra's algorithm?')"
             rows={1}
             disabled={isLoading}
             className="w-full bg-transparent text-sm text-gray-900 placeholder-gray-400 px-3 py-2 focus:outline-none resize-none max-h-32 min-h-[40px] font-medium"

@@ -4,13 +4,19 @@ import { askSocraticTutor } from "@/lib/gemini";
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { prompt, courseContext, history } = body;
+    const { prompt, courseContext, history, studentProfile } = body;
 
     if (!prompt) {
       return NextResponse.json({ error: "Prompt is required" }, { status: 400 });
     }
 
-    const reply = await askSocraticTutor(prompt, courseContext, undefined, history || []);
+    const reply = await askSocraticTutor(
+      prompt,
+      courseContext,
+      undefined,
+      history || [],
+      studentProfile
+    );
 
     return NextResponse.json({ reply });
   } catch (error) {

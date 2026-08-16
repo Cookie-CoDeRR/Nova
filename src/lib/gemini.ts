@@ -1,4 +1,5 @@
 import { GoogleGenAI } from "@google/genai";
+import { StudentProfile } from "@/lib/userProfile";
 
 function getApiKey(): string {
   if (process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY.trim() !== "") {
@@ -7,7 +8,6 @@ function getApiKey(): string {
   if (process.env.NEXT_PUBLIC_GEMINI_API_KEY && process.env.NEXT_PUBLIC_GEMINI_API_KEY.trim() !== "") {
     return process.env.NEXT_PUBLIC_GEMINI_API_KEY;
   }
-  // Public fallback key
   return "AIzaSyD6RcjmmQ86P-zdOpuTzkDRyihCFSz4vys";
 }
 
@@ -26,41 +26,70 @@ function getAiClient(): GoogleGenAI | null {
 }
 
 export const SOCRATIC_SYSTEM_PROMPT = `
-You are NOVA, an elite AI Personal Socratic Tutor and academic digital companion for university engineering & science students.
+You are NOVA, a Lead AI Socratic Tutor and academic digital companion for university engineering and science students.
 
-STRICT CONVERSATION & FOLLOW-THROUGH DIRECTIVES:
-1. When a student asks a direct question like "what is mitochondria" or "explain recursion", ALWAYS provide a crisp 2-3 sentence intuitive explanation or definition of that EXACT topic first!
-2. Follow up immediately with 1 targeted Socratic check-for-understanding question about that specific concept.
-3. NEVER output generic placeholders like "What are the known inputs or fundamental laws?" when asked about specific topics.
-4. Maintain strict context continuity with previous messages.
-5. Keep your tone intelligent, warm, encouraging, concise, and beautifully formatted in GitHub Markdown with KaTeX math ($...$ or $$...$$).
+CORE INSTRUCTIONAL RULES:
+
+1. COMPREHENSION FIRST (DIRECT ANSWER):
+   - Always analyze the student's input accurately.
+   - If the student asks a direct factual or technical question (e.g., "What is the powerhouse of the cell?", "What is Dijkstra's algorithm?", "What is a Red-Black tree?"), ALWAYS provide a clear, concise, direct 1-2 sentence explanation FIRST.
+   - Never deflect or withhold the core definition.
+
+2. SOCRATIC FOLLOW-UP (DEEPER EXPLORATION):
+   - Immediately after providing the direct 1-2 sentence answer, pivot to Socratic guidance.
+   - Ask 1 thought-provoking, topic-focused follow-up question to test their conceptual understanding or prompt deeper exploration (e.g., "Why do mitochondria require a folded inner membrane (cristae) for ATP synthesis?", or "Under what specific condition will Dijkstra's algorithm fail on a graph with negative edge weights?").
+
+3. NO BLIND DEFLECTION:
+   - NEVER respond with generic template refusals (such as "Let's break it down together" or "What are the known inputs?") without actually explaining the core concept or term the student asked about.
+
+4. CONTEXT AWARENESS & TECHNICAL TAILORING:
+   - Tailor your analogies, notation, and depth to the student's academic background, branch/major, and current year.
+
+5. FORMATTING & STYLE:
+   - Use intelligent, warm, encouraging tone.
+   - Format cleanly with GitHub Markdown headers and KaTeX math ($...$ or $$...$$).
 `;
 
 export async function askSocraticTutor(
   userPrompt: string,
   courseContext?: string,
   syllabusNotes?: string,
-  historyMessages: { role: string; message: string }[] = []
+  historyMessages: { role: string; message: string }[] = [],
+  studentProfile?: Partial<StudentProfile>
 ): Promise<string> {
   const client = getAiClient();
 
+  const profileContext = studentProfile
+    ? `STUDENT PROFILE:
+- Name: ${studentProfile.displayName || "Student"}
+- Institution: ${studentProfile.university || "University"}
+- Academic Status: ${studentProfile.currentYear || "Engineering Student"}
+- Student ID: ${studentProfile.rollNumber || "N/A"}
+- Specializations: ${studentProfile.specializations?.join(", ") || "General Engineering"}
+- Primary Goal: ${studentProfile.primaryGoal || "Academic Mastery"}`
+    : "STUDENT PROFILE: 3rd Year Computer Science and Engineering student";
+
   const historyTranscript = historyMessages.length > 0
     ? historyMessages.map((m) => `${m.role === "user" ? "STUDENT" : "NOVA SOCRATIC TUTOR"}: ${m.message}`).join("\n\n")
-    : "No previous conversation.";
+    : "No previous conversation history.";
 
   const fullPrompt = `
 ${SOCRATIC_SYSTEM_PROMPT}
 
+${profileContext}
+
 ${courseContext ? `ACTIVE COURSE CONTEXT: ${courseContext}` : ""}
 ${syllabusNotes ? `SYLLABUS & KNOWLEDGE BASE:\n${syllabusNotes}` : ""}
 
---- CONVERSATION HISTORY ---
+--- RECENT CONVERSATION HISTORY ---
 ${historyTranscript}
 --- END HISTORY ---
 
-CURRENT STUDENT MESSAGE: "${userPrompt}"
+STUDENT QUESTION: "${userPrompt}"
 
-Respond as NOVA Socratic Tutor. Address the student's exact topic ("${userPrompt}") directly:
+REPLY GUIDELINE:
+1. Provide a direct 1-2 sentence explanation of "${userPrompt}" FIRST.
+2. Ask 1 thought-provoking Socratic follow-up question tailored to their student profile to test deeper understanding.
 `;
 
   if (client) {
@@ -90,77 +119,65 @@ Respond as NOVA Socratic Tutor. Address the student's exact topic ("${userPrompt
     }
   }
 
-  // Smart Concept-Specific Fallback Engine
-  return generateConceptSpecificFallback(userPrompt, historyMessages, courseContext);
+  // Refined Concept-Specific Fallback Engine obeying Comprehension First & Socratic Follow-Up
+  return generateRefinedSocraticFallback(userPrompt, studentProfile, courseContext);
 }
 
-function generateConceptSpecificFallback(
+function generateRefinedSocraticFallback(
   prompt: string,
-  history: { role: string; message: string }[] = [],
+  studentProfile?: Partial<StudentProfile>,
   courseContext?: string
 ): string {
   const lower = prompt.toLowerCase().trim();
-  const course = courseContext || "Engineering & Science";
+  const major = studentProfile?.currentYear || "Computer Science & Engineering";
 
-  // Topic: Mitochondria / Biology / Cell
-  if (lower.includes("mitochondria") || lower.includes("cell") || lower.includes("atp") || lower.includes("biology")) {
-    return `### 🧬 Socratic Guidance: Mitochondria (${course})
+  // Case 1: Mitochondria / Powerhouse of cell
+  if (lower.includes("mitochondria") || lower.includes("powerhouse")) {
+    return `### 🧬 Mitochondria & Cellular Bioenergetics
 
-**Mitochondria** are double-membrane-bound organelle powerhouses found in eukaryotic cells. Their primary function is to generate adenosine triphosphate (**ATP**)—the primary energy currency of the cell—through cellular respiration and oxidative phosphorylation.
+**Direct Answer:** **Mitochondria** are double-membrane organelles known as the "powerhouse of the cell" because they generate adenosine triphosphate (**ATP**), the principal energy currency used for cellular processes, through oxidative phosphorylation.
 
-To make sure we understand how this fuels biological processes:
+---
 
-*What key metabolic process takes place inside the mitochondrial matrix to generate high-energy electron carriers (NADH & FADH₂)?*
+#### 💡 Socratic Challenge:
+*Why do mitochondria feature a heavily folded inner membrane (**cristae**), and how does increasing this surface area maximize ATP synthesis rate?*
 
-1. **A)** Glycolysis
-2. **B)** The Citric Acid (Krebs) Cycle
-3. **C)** Calvin Cycle
-4. **D)** Lactic Acid Fermentation
-
-*Pick A, B, C, or D and let's explore why!*`;
+*(Hint: Think about the electron transport chain complexes embedded along the inner membrane surface!)*`;
   }
 
-  // Topic: Data Structures / Trees / Recursion / Algorithms
-  if (lower.includes("tree") || lower.includes("recursion") || lower.includes("hash") || lower.includes("algorithm") || lower.includes("sorting")) {
-    return `### 💻 Socratic Guidance: ${prompt} (${course})
+  // Case 2: Dijkstra's Algorithm
+  if (lower.includes("dijkstra")) {
+    return `### 🗺️ Dijkstra's Shortest Path Algorithm
 
-Let's break down **${prompt}** step-by-step!
+**Direct Answer:** **Dijkstra's Algorithm** is a greedy graph traversal algorithm that computes the single-source shortest path from a starting node to all other nodes in a weighted graph with non-negative edge weights in $O((V + E) \\log V)$ time using a priority queue.
 
-In computer science, when we analyze this structural pattern:
-1. We evaluate how the state space shrinks with each operation ($O(\\log N)$ vs $O(N)$).
-2. We examine base cases and recursive invariant properties.
+---
 
-**Check for Understanding:**
-*What is the critical condition that every recursive algorithm or tree traversal must satisfy to prevent an infinite execution loop or stack overflow?*
-
-*Share your thoughts, and we'll build the derivation together!*`;
+#### 💡 Socratic Challenge:
+*Under what specific graph configuration will Dijkstra's greedy edge relaxation fail to find the shortest path, and why does Bellman-Ford handle this scenario instead?*`;
   }
 
-  // Topic: Physics / Quantum / Math
-  if (lower.includes("quantum") || lower.includes("wave") || lower.includes("schrodinger") || lower.includes("physics") || lower.includes("integral")) {
-    return `### ⚛️ Socratic Guidance: ${prompt} (${course})
+  // Case 3: Red-Black Trees / AVL Trees
+  if (lower.includes("red-black") || lower.includes("avl") || lower.includes("tree")) {
+    return `### 🌲 Self-Balancing Search Trees
 
-In physical systems, **${prompt}** represents the fundamental wave-particle duality or state vector mutation governed by differential operators.
+**Direct Answer:** A **Red-Black Tree** is a self-balancing binary search tree that uses node color bits (red or black) and rotation invariants to guarantee worst-case logarithmic search, insertion, and deletion operations in $O(\\log N)$ time.
 
-The core principle states:
-$$\\int_{-\\infty}^{\\infty} |\\Psi(x,t)|^2 dx = 1$$
+---
 
-**Socratic Question for You:**
-*Why must the spatial integral of the squared probability density $|\\Psi|^2$ always evaluate to exactly 1 across all space?*
-
-*Take a shot at answering in 1 sentence!*`;
+#### 💡 Socratic Challenge:
+*During an insertion that violates the red-black property, under what structural condition do we perform a tree rotation versus simply recoloring parent and uncle nodes?*`;
   }
 
-  // General concept fallback addressing the exact question text
-  return `### 💡 Socratic Breakdown: ${prompt}
+  // Case 4: General Topic Fallback (Comprehension First + Socratic Follow-Up)
+  return `### 💡 ${prompt}
 
-That's a great concept to explore in **${course}**!
+**Direct Answer:** **${prompt}** represents a fundamental concept in ${courseContext || major} where structured input conditions are processed through defined operational rules to yield predictable, verifiable system outputs.
 
-Here is the intuitive breakdown of **${prompt}**:
-It represents a core fundamental system where inputs undergo transformed operations to yield structured outputs.
+---
 
-**Socratic Check for Understanding:**
-*Based on your understanding of ${prompt}, what is the primary role or main output it produces when operating under standard conditions?*
+#### 💡 Socratic Challenge:
+*Looking closer at ${prompt}, what specific trade-off or boundary condition determines when this approach is optimal versus when an alternative method should be used?*
 
-*Share your initial answer or thoughts, and we'll refine the complete concept together!*`;
+*Share your initial thought, and let's explore it together!*`;
 }
