@@ -7,6 +7,7 @@ import { auth, googleProvider } from "@/lib/firebase";
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import { Sparkles, ArrowRight, Lock, Mail, Check, LogIn, UserPlus } from "lucide-react";
 import { GlobalNotebookBg } from "@/components/ui/GlobalNotebookBg";
+import { NovaLogo } from "@/components/ui/NovaLogo";
 import { getStudentProfile } from "@/lib/userProfile";
 import { cn } from "@/lib/utils";
 
@@ -82,12 +83,9 @@ export default function AuthPage() {
       <GlobalNotebookBg />
 
       {/* Brand Link */}
-      <Link href="/" className="absolute top-8 left-8 flex items-center gap-2 z-20 hover:opacity-80 transition-opacity">
-        <div className="w-8 h-8 rounded-lg bg-gray-900 flex items-center justify-center font-bold text-xs text-white shadow-xs">
-          N
-        </div>
-        <span className="font-extrabold text-sm tracking-wider text-gray-900 font-sans">NOVA SANCTUARY</span>
-      </Link>
+      <div className="absolute top-8 left-8 z-20">
+        <NovaLogo size="md" showText={true} href="/" />
+      </div>
 
       {/* Auth Card Container */}
       <motion.div

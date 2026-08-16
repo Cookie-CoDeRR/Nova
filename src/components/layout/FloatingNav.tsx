@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import { LayoutDashboard, Sparkles, Brain, Target, BarChart2 } from "lucide-react";
+import { NovaLogo } from "@/components/ui/NovaLogo";
 import { cn } from "@/lib/utils";
 
 interface FloatingNavProps {
@@ -48,18 +49,12 @@ export function FloatingNav({ onToggleFocusMode, isFocusModeActive }: FloatingNa
         initial={{ y: 50, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-        className="glass-pill px-4 py-2.5 rounded-full flex items-center gap-2 border border-gray-200 shadow-md bg-white/95 backdrop-blur-md"
+        className="glass-pill px-4 py-2 rounded-full flex items-center gap-2 border border-gray-200 shadow-md bg-white/95 backdrop-blur-md"
       >
-        {/* Brand indicator */}
-        <Link 
-          href="/" 
-          className="flex items-center gap-2 pr-3 border-r border-gray-200 hover:opacity-80 transition-opacity"
-        >
-          <div className="w-7 h-7 rounded-lg bg-gray-900 flex items-center justify-center font-bold text-xs text-white shadow-xs">
-            N
-          </div>
-          <span className="font-extrabold text-xs tracking-wider text-gray-900 hidden sm:inline">NOVA</span>
-        </Link>
+        {/* Official Brand Logo */}
+        <div className="pr-3 border-r border-gray-200">
+          <NovaLogo size="sm" showText={true} href="/" />
+        </div>
 
         {/* Navigation Items */}
         <div className="flex items-center gap-1">
@@ -103,7 +98,7 @@ export function FloatingNav({ onToggleFocusMode, isFocusModeActive }: FloatingNa
             <button
               onClick={onToggleFocusMode}
               className={cn(
-                "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all duration-300 border",
+                "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all duration-300 border cursor-pointer",
                 isFocusModeActive
                   ? "bg-amber-100 text-amber-900 border-amber-300 shadow-sm animate-pulse"
                   : "bg-gray-100 text-gray-700 border-gray-200 hover:bg-gray-200"

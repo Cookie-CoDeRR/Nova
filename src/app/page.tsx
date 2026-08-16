@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { FloatingPages } from "@/components/landing/FloatingPages";
 import { Sparkles, Bot, MapPin, Brain, ArrowRight, CheckCircle2, Play, Zap } from "lucide-react";
+import { NovaLogo } from "@/components/ui/NovaLogo";
 
 export default function NarrativeLandingPage() {
   return (
@@ -23,12 +24,9 @@ export default function NarrativeLandingPage() {
       <div className="relative z-10 w-full max-w-6xl mx-auto px-4 sm:px-8 pt-6 pb-32 space-y-20">
         
         {/* Top Navbar */}
-        <header className="flex items-center justify-between py-3.5 px-6 bg-white/95 backdrop-blur-md border border-gray-200 rounded-full shadow-md sticky top-4 z-40">
+        <header className="flex items-center justify-between py-3 px-6 bg-white/95 backdrop-blur-md border border-gray-200 rounded-full shadow-md sticky top-4 z-40">
           <div className="flex items-center gap-2.5">
-            <div className="w-7 h-7 rounded-lg bg-gray-900 flex items-center justify-center font-bold text-xs text-white shadow-xs">
-              N
-            </div>
-            <span className="font-extrabold text-sm tracking-tight text-gray-900">NOVA</span>
+            <NovaLogo size="sm" showText={true} href="/" />
             <span className="text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-full bg-purple-50 text-purple-900 border border-purple-200">
               Academic Sanctuary
             </span>
@@ -385,8 +383,7 @@ export default function NarrativeLandingPage() {
         {/* Footer */}
         <footer className="pt-16 border-t border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-500">
           <div className="flex items-center gap-2">
-            <div className="w-5 h-5 rounded bg-gray-900 flex items-center justify-center text-[10px] font-bold text-white">N</div>
-            <span className="font-bold text-gray-900">NOVA Narrative Workspace</span>
+            <NovaLogo size="sm" showText={true} href="/" />
             <span>© 2026. Academic Productivity Platform.</span>
           </div>
 

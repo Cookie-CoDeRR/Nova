@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { Flame, Bell, Sparkles, GraduationCap, Settings, User } from "lucide-react";
 import { getStudentProfile, StudentProfile, DEFAULT_PROFILE } from "@/lib/userProfile";
 import { EditProfileModal } from "@/components/dashboard/EditProfileModal";
+import { NovaLogo } from "@/components/ui/NovaLogo";
 
 interface TopHeaderProps {
   urgentCount?: number;
@@ -34,19 +35,23 @@ export function TopHeader({
 
   return (
     <>
-      <header className="w-full py-4 px-4 sm:px-8 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-200 bg-white/90 backdrop-blur-md sticky top-0 z-40 shadow-xs">
-        {/* Left Greeting & University Details */}
-        <div>
-          <div className="flex items-center gap-2 text-[10px] font-bold font-mono uppercase tracking-wider text-purple-700 mb-0.5">
-            <Sparkles className="w-3.5 h-3.5 text-purple-600" />
-            <span>NOVA Digital Workspace • {profile.university}</span>
+      <header className="w-full py-3.5 px-4 sm:px-8 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-200 bg-white/90 backdrop-blur-md sticky top-0 z-40 shadow-xs">
+        {/* Left Greeting & Official Logo */}
+        <div className="flex items-center gap-4">
+          <NovaLogo size="md" showText={false} href="/dashboard" />
+          
+          <div>
+            <div className="flex items-center gap-2 text-[10px] font-bold font-mono uppercase tracking-wider text-purple-700 mb-0.5">
+              <Sparkles className="w-3.5 h-3.5 text-purple-600" />
+              <span>NOVA Digital Workspace • {profile.university}</span>
+            </div>
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-gray-900 flex items-center gap-2 font-serif">
+              <span>{greeting}, {profile.displayName.split(" ")[0]}.</span>
+            </h1>
+            <p className="text-xs text-gray-600 mt-0.5">
+              <span className="font-semibold text-gray-800">{profile.currentYear}</span> • ID: <span className="font-mono text-gray-800">{profile.rollNumber}</span>
+            </p>
           </div>
-          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-gray-900 flex items-center gap-2 font-serif">
-            <span>{greeting}, {profile.displayName.split(" ")[0]}.</span>
-          </h1>
-          <p className="text-xs text-gray-600 mt-0.5">
-            <span className="font-semibold text-gray-800">{profile.currentYear}</span> • ID: <span className="font-mono text-gray-800">{profile.rollNumber}</span>
-          </p>
         </div>
 
         {/* Right Student Quick Stats, Badges & Profile Modal Trigger */}
@@ -66,7 +71,7 @@ export function TopHeader({
           {/* Edit Profile Settings Button */}
           <button
             onClick={() => setIsEditModalOpen(true)}
-            className="p-2 rounded-full bg-gray-100 border border-gray-200 text-gray-700 hover:text-gray-900 hover:bg-gray-200 transition-colors flex items-center gap-1 text-xs font-bold px-3"
+            className="p-2 rounded-full bg-gray-100 border border-gray-200 text-gray-700 hover:text-gray-900 hover:bg-gray-200 transition-colors flex items-center gap-1 text-xs font-bold px-3 cursor-pointer"
             title="Edit Profile & Specialization"
           >
             <Settings className="w-3.5 h-3.5 text-gray-600" />

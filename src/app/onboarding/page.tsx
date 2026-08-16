@@ -3,10 +3,10 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { GlobalNotebookBg } from "@/components/ui/GlobalNotebookBg";
-import { saveStudentProfile, StudentProfile, DEFAULT_PROFILE } from "@/lib/userProfile";
+import { saveStudentProfile } from "@/lib/userProfile";
 import { auth } from "@/lib/firebase";
 import { Sparkles, GraduationCap, BookOpen, CheckCircle2, ArrowRight, ArrowLeft, ShieldCheck, Zap, User } from "lucide-react";
-import Link from "next/link";
+import { NovaLogo } from "@/components/ui/NovaLogo";
 
 const SPECIALIZATION_OPTIONS = [
   { id: "fullstack", title: "Full-Stack Web Development", desc: "Next.js, React, Node.js, Cloud APIs & Systems" },
@@ -95,12 +95,12 @@ export default function OnboardingPage() {
       {/* Global Scroll-Aware & Breathing Notebook Page Background */}
       <GlobalNotebookBg />
 
-      {/* Brand Header */}
-      <div className="absolute top-8 left-8 flex items-center gap-2 z-20">
-        <div className="w-8 h-8 rounded-lg bg-gray-900 flex items-center justify-center font-bold text-xs text-white shadow-xs">
-          N
-        </div>
-        <span className="font-extrabold text-sm tracking-wider text-gray-900 font-sans">NOVA ONBOARDING WIZARD</span>
+      {/* Brand Header Logo */}
+      <div className="absolute top-8 left-8 z-20 flex items-center gap-2">
+        <NovaLogo size="sm" showText={true} href="/" />
+        <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-purple-50 text-purple-900 border border-purple-200">
+          ONBOARDING
+        </span>
       </div>
 
       {/* Main Wizard Container */}
