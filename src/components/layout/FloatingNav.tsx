@@ -39,7 +39,7 @@ export function FloatingNav({ onToggleFocusMode, isFocusModeActive }: FloatingNa
   ];
 
   return (
-    <div className="fixed bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-50 w-auto max-w-[98vw]">
+    <div className="floating-nav fixed bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-50 w-auto max-w-[98vw] transition-opacity duration-200">
       <motion.nav
         initial={{ y: 50, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}

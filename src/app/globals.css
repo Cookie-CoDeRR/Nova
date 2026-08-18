@@ -73,3 +73,15 @@
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(0, 0, 0, 0.3);
 }
+
+/* Hide top header and bottom floating nav when any modal/panel is open */
+body.profile-modal-open header,
+body.profile-modal-open .floating-nav,
+body.notif-panel-open header,
+body.notif-panel-open .floating-nav,
+body.stat-modal-open header,
+body.stat-modal-open .floating-nav {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}

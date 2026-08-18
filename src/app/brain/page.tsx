@@ -1,13 +1,15 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { useForm } from "react-hook-form";
+import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { parseSyllabusAction, Milestone } from "@/app/actions/parse-syllabus";
 import { Sparkles, Brain, Play, Pause, RotateCcw, X, Target, CheckCircle2, BookOpen, Zap } from "lucide-react";
 import { NptelSyncCard } from "@/components/brain/NptelSyncCard";
 import { KnowledgeList } from "@/components/brain/KnowledgeList";
 import { cn } from "@/lib/utils";
+import { SPECIALIZATION_SYLLABI } from "@/lib/constants";
 
 interface FormInputs {
   syllabusText: string;
@@ -32,7 +34,10 @@ Week 4: Hydrogen Atom, Angular Momentum, Spherical Harmonics.`,
   },
 ];
 
-export default function BrainPage() {
+export function BrainPageContent() {
+  const searchParams = useSearchParams();
+  const specialization = searchParams.get("specialization");
+
   const [milestones, setMilestones] = useState<Milestone[]>([
     {
       weekNumber: 1,
@@ -83,7 +88,15 @@ export default function BrainPage() {
     }
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
+    if (specialization && SPECIALIZATION_SYLLABI[specialization]) {
+      const syllabusText = SPECIALIZATION_SYLLABI[specialization];
+      setValue("syllabusText", syllabusText);
+      onSubmit({ syllabusText });
+    }
+  }, [specialization]);
+
+  useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
     if (isTimerRunning && timerSeconds > 0) {
       interval = setInterval(() => {
@@ -421,5 +434,13 @@ export default function BrainPage() {
       </AnimatePresence>
 
     </div>
+  );
+}
+
+export default function BrainPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#FAFAFA] flex items-center justify-center text-xs text-gray-400">Loading...</div>}>
+      <BrainPageContent />
+    </Suspense>
   );
 }

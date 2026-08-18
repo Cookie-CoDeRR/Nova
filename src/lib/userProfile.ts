@@ -60,20 +60,49 @@ export const DEMO_SAMPLE_PROFILE: StudentProfile = {
 
 const LOCAL_STORAGE_KEY = "nova_student_profile";
 
-export async function saveStudentProfile(profile: Partial<StudentProfile>): Promise<StudentProfile> {
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
+/** Race a promise against a ms timeout. Returns null if timeout wins. */
+function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T | null> {
+  return Promise.race([
+    promise,
+    new Promise<null>((resolve) => setTimeout(() => resolve(null), ms)),
+  ]);
+}
+
+function readLocalProfile(): StudentProfile | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const cached = localStorage.getItem(LOCAL_STORAGE_KEY);
+    return cached ? (JSON.parse(cached) as StudentProfile) : null;
+  } catch {
+    return null;
+  }
+}
+
+function writeLocalProfile(profile: StudentProfile): void {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(profile));
+  } catch (e) {
+    console.warn("LocalStorage write warning:", e);
+  }
+}
+
+// ─── Public API ───────────────────────────────────────────────────────────────
+
+/**
+ * Save a (partial) student profile.
+ * - Writes to localStorage immediately (zero latency for redirects / UI).
+ * - Best-effort sync to Firestore (1.5 s timeout, non-blocking).
+ */
+export async function saveStudentProfile(
+  profile: Partial<StudentProfile>
+): Promise<StudentProfile> {
   const user = auth.currentUser;
   const uid = user?.uid || profile.uid || "new_student";
 
-  // Check existing cached profile or create new student profile
-  let baseProfile = NEW_USER_PROFILE;
-  if (typeof window !== "undefined") {
-    const cached = localStorage.getItem(LOCAL_STORAGE_KEY);
-    if (cached) {
-      try {
-        baseProfile = JSON.parse(cached);
-      } catch (e) {}
-    }
-  }
+  const baseProfile = readLocalProfile() ?? NEW_USER_PROFILE;
 
   const updatedProfile: StudentProfile = {
     ...baseProfile,
@@ -83,67 +112,77 @@ export async function saveStudentProfile(profile: Partial<StudentProfile>): Prom
     email: profile.email || user?.email || baseProfile.email,
     onboarded: true,
     updatedAt: new Date().toISOString(),
+    createdAt: baseProfile.createdAt ?? new Date().toISOString(),
   };
 
-  // 1. Synchronously save to LocalStorage for instant zero-latency client UI & routing
-  if (typeof window !== "undefined") {
-    try {
-      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updatedProfile));
-    } catch (e) {
-      console.warn("LocalStorage save warning:", e);
-    }
-  }
+  // 1. Write to localStorage immediately — UI never waits on Firestore
+  writeLocalProfile(updatedProfile);
 
-  // 2. Non-blocking async firestore save with 1.2s timeout race
+  // 2. Best-effort Firestore sync — fire and forget, never blocks user flow
   if (user && db) {
-    const firestoreSave = async () => {
-      try {
-        const userRef = doc(db, "users", uid);
-        await setDoc(userRef, updatedProfile, { merge: true });
-      } catch (err) {
-        console.warn("Firestore profile sync warning:", err);
-      }
-    };
-
-    await Promise.race([
-      firestoreSave(),
-      new Promise((resolve) => setTimeout(resolve, 1200)),
-    ]);
+    Promise.race([
+      (async () => {
+        try {
+          await setDoc(doc(db, "users", uid), updatedProfile, { merge: true });
+        } catch (err) {
+          console.warn("Firestore profile sync warning (non-fatal):", err);
+        }
+      })(),
+      new Promise((resolve) => setTimeout(resolve, 1500)),
+    ]).catch(() => {});
   }
 
   return updatedProfile;
 }
 
+/**
+ * Get the current student profile.
+ * 1. Returns localStorage immediately if available (instant).
+ * 2. Falls back to Firestore (3 s timeout) — auto-creates doc for new users.
+ * 3. Returns blank NEW_USER_PROFILE if all else fails (never crashes).
+ */
 export async function getStudentProfile(): Promise<StudentProfile> {
-  // 1. Check local storage first
-  if (typeof window !== "undefined") {
-    const cached = localStorage.getItem(LOCAL_STORAGE_KEY);
-    if (cached) {
-      try {
-        return JSON.parse(cached) as StudentProfile;
-      } catch (e) {
-        console.error("Error parsing cached profile:", e);
-      }
-    }
-  }
+  // 1. Return from localStorage immediately if available
+  const cached = readLocalProfile();
+  if (cached) return cached;
 
-  // 2. Check Firestore if authenticated
+  // 2. If authenticated, try Firestore with a 3s timeout
   const user = auth.currentUser;
   if (user && db) {
-    try {
-      const userRef = doc(db, "users", user.uid);
-      const snap = await getDoc(userRef);
-      if (snap.exists()) {
-        const profile = snap.data() as StudentProfile;
-        if (typeof window !== "undefined") {
-          localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(profile));
+    const firestoreLoad = async (): Promise<StudentProfile | null> => {
+      try {
+        const userRef = doc(db, "users", user.uid);
+        const snap = await getDoc(userRef);
+
+        if (snap.exists()) {
+          const profile = snap.data() as StudentProfile;
+          writeLocalProfile(profile);
+          return profile;
         }
-        return profile;
+
+        // New user — no Firestore doc yet. Create a default one.
+        const defaultProfile: StudentProfile = {
+          ...NEW_USER_PROFILE,
+          uid: user.uid,
+          displayName: user.displayName || NEW_USER_PROFILE.displayName,
+          email: user.email || NEW_USER_PROFILE.email,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        };
+
+        await setDoc(userRef, defaultProfile);
+        writeLocalProfile(defaultProfile);
+        return defaultProfile;
+      } catch (err) {
+        console.warn("Firestore getStudentProfile warning (non-fatal):", err);
+        return null;
       }
-    } catch (err) {
-      console.warn("Firestore fetch profile warning:", err);
-    }
+    };
+
+    const result = await withTimeout(firestoreLoad(), 3000);
+    if (result) return result;
   }
 
+  // 3. Final fallback — never crash
   return NEW_USER_PROFILE;
 }

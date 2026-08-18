@@ -66,7 +66,7 @@ export default function AuthPage() {
     setMessage(null);
     try {
       await signInWithPopup(auth, googleProvider);
-      setMessage({ type: "success", text: "Google Authentication successful! Redirecting to Onboarding..." });
+      setMessage({ type: "success", text: "Google Authentication successful! Redirecting..." });
       setTimeout(checkRedirect, 800);
     } catch (err: any) {
       console.error("Firebase Google Auth error:", err);

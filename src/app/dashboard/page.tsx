@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { generateMockHeatmapData, MOCK_SUBJECT_BREAKDOWN_FULL, MOCK_SUBJECT_BREAKDOWN_EMPTY, HeatmapDay } from "@/lib/mockData";
 import { generateWeeklyReportAction } from "@/app/actions/generate-weekly-report";
@@ -12,6 +13,7 @@ import { cn } from "@/lib/utils";
 import ReactMarkdown from "react-markdown";
 
 export default function StudyPulseDashboardPage() {
+  const router = useRouter();
   const [profile, setProfile] = useState<StudentProfile>(NEW_USER_PROFILE);
   const [isDemoDataLoaded, setIsDemoDataLoaded] = useState(false);
   const [heatmapData, setHeatmapData] = useState<HeatmapDay[]>(generateMockHeatmapData(true));
@@ -138,9 +140,15 @@ export default function StudyPulseDashboardPage() {
           <div className="flex items-center gap-1.5 pt-2 flex-wrap">
             <span className="text-[10px] font-mono font-bold text-gray-400 uppercase">Specializations:</span>
             {profile.specializations.map((spec, idx) => (
-              <span key={idx} className="text-[10px] font-semibold bg-gray-100 border border-gray-200 text-gray-800 px-2.5 py-0.5 rounded-full">
-                {spec}
-              </span>
+              <button
+                key={idx}
+                onClick={() => router.push(`/brain?specialization=${encodeURIComponent(spec)}`)}
+                className="text-[10px] font-bold bg-purple-50 border border-purple-200 text-purple-800 px-2.5 py-0.5 rounded-full hover:bg-purple-100 hover:border-purple-300 transition-all cursor-pointer flex items-center gap-1 group shadow-3xs"
+                title={`Synthesize roadmap for ${spec}`}
+              >
+                <span>{spec}</span>
+                <span className="opacity-40 group-hover:opacity-100 transition-opacity">→</span>
+              </button>
             ))}
           </div>
         </div>
@@ -206,7 +214,10 @@ export default function StudyPulseDashboardPage() {
       {/* Key Metric Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Total Focus Hours */}
-        <div className="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm flex flex-col justify-between hover:shadow-md transition-all duration-300">
+        <button
+          onClick={() => router.push("/progress?stat=focus")}
+          className="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm flex flex-col justify-between hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 text-left cursor-pointer group"
+        >
           <div className="flex items-center justify-between text-purple-800">
             <Clock className="w-5 h-5" />
             <span className="text-[10px] font-bold font-mono px-2 py-0.5 rounded bg-purple-50 border border-purple-200">
@@ -219,10 +230,14 @@ export default function StudyPulseDashboardPage() {
             </div>
             <div className="text-xs text-gray-600 font-medium mt-0.5">Total Focused Study</div>
           </div>
-        </div>
+          <div className="text-[10px] font-mono text-purple-500 mt-3 opacity-0 group-hover:opacity-100 transition-opacity">View progress →</div>
+        </button>
 
         {/* Weekly Streak */}
-        <div className="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm flex flex-col justify-between hover:shadow-md transition-all duration-300">
+        <button
+          onClick={() => router.push("/progress?stat=streak")}
+          className="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm flex flex-col justify-between hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 text-left cursor-pointer group"
+        >
           <div className="flex items-center justify-between text-amber-800">
             <Flame className="w-5 h-5 fill-amber-500/20" />
             <span className="text-[10px] font-bold font-mono px-2 py-0.5 rounded bg-amber-50 border border-amber-200">
@@ -236,10 +251,14 @@ export default function StudyPulseDashboardPage() {
             </div>
             <div className="text-xs text-gray-600 font-medium mt-0.5">Consecutive Streak</div>
           </div>
-        </div>
+          <div className="text-[10px] font-mono text-amber-500 mt-3 opacity-0 group-hover:opacity-100 transition-opacity">View progress →</div>
+        </button>
 
         {/* Milestone Completion */}
-        <div className="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm flex flex-col justify-between hover:shadow-md transition-all duration-300">
+        <button
+          onClick={() => router.push("/progress?stat=milestones")}
+          className="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm flex flex-col justify-between hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 text-left cursor-pointer group"
+        >
           <div className="flex items-center justify-between text-emerald-800">
             <Target className="w-5 h-5" />
             <span className="text-[10px] font-bold font-mono px-2 py-0.5 rounded bg-emerald-50 border border-emerald-200">
@@ -252,10 +271,14 @@ export default function StudyPulseDashboardPage() {
             </div>
             <div className="text-xs text-gray-600 font-medium mt-0.5">Milestones Conquered</div>
           </div>
-        </div>
+          <div className="text-[10px] font-mono text-emerald-500 mt-3 opacity-0 group-hover:opacity-100 transition-opacity">View progress →</div>
+        </button>
 
         {/* Quiz Mastery */}
-        <div className="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm flex flex-col justify-between hover:shadow-md transition-all duration-300">
+        <button
+          onClick={() => router.push("/progress?stat=accuracy")}
+          className="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm flex flex-col justify-between hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 text-left cursor-pointer group"
+        >
           <div className="flex items-center justify-between text-blue-800">
             <TrendingUp className="w-5 h-5" />
             <span className="text-[10px] font-bold font-mono px-2 py-0.5 rounded bg-blue-50 border border-blue-200">
@@ -268,8 +291,10 @@ export default function StudyPulseDashboardPage() {
             </div>
             <div className="text-xs text-gray-600 font-medium mt-0.5">Quiz Mastery Score</div>
           </div>
-        </div>
+          <div className="text-[10px] font-mono text-blue-500 mt-3 opacity-0 group-hover:opacity-100 transition-opacity">View progress →</div>
+        </button>
       </div>
+
 
       {/* 1. Productivity Heatmap Grid Card */}
       <div className="bg-white border border-gray-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-4">

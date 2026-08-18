@@ -39,6 +39,16 @@ export function EditProfileModal({ isOpen, onClose, currentProfile, onProfileUpd
     setPrimaryGoal(currentProfile.primaryGoal);
   }, [currentProfile, isOpen]);
 
+  // Hide the top header and bottom floating nav when the profile modal is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.classList.add("profile-modal-open");
+    } else {
+      document.body.classList.remove("profile-modal-open");
+    }
+    return () => document.body.classList.remove("profile-modal-open");
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   const toggleSpec = (spec: string) => {
@@ -77,8 +87,8 @@ export function EditProfileModal({ isOpen, onClose, currentProfile, onProfileUpd
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-gray-900/40 backdrop-blur-xs flex items-center justify-center p-4">
-      <div className="w-full max-w-xl bg-white border border-gray-200 rounded-3xl p-6 sm:p-8 shadow-xl font-sans text-gray-800 relative max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 z-[60] bg-gray-900/50 backdrop-blur-sm flex items-center justify-center p-4">
+      <div className="w-full max-w-2xl bg-white border border-gray-200 rounded-3xl p-6 sm:p-8 shadow-2xl font-sans text-gray-800 relative max-h-[88vh] overflow-y-auto">
         <div className="flex items-center justify-between border-b border-gray-100 pb-4 mb-4">
           <div className="flex items-center gap-3">
             <div className="p-2.5 rounded-xl bg-purple-50 border border-purple-200 text-purple-800">
