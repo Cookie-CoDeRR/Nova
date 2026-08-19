@@ -397,13 +397,20 @@ export default function StudyPulseDashboardPage() {
 
             <div className="space-y-2.5 text-xs font-medium">
               {subjectBreakdownData.map((subject, idx) => (
-                <div key={idx} className="flex items-center justify-between p-2.5 rounded-xl bg-gray-50 border border-gray-200">
+                <button
+                  key={idx} 
+                  onClick={() => router.push(`/subject-report?subject=${encodeURIComponent(subject.name)}`)}
+                  className="w-full flex items-center justify-between p-2.5 rounded-xl bg-gray-50 border border-gray-200 hover:bg-white hover:border-gray-300 hover:shadow-sm transition-all cursor-pointer text-left group"
+                >
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded-full" style={{ backgroundColor: subject.color }} />
-                    <span className="font-bold text-gray-900 truncate">{subject.name}</span>
+                    <span className="font-bold text-gray-900 truncate group-hover:text-purple-700 transition-colors">{subject.name}</span>
                   </div>
-                  <span className="font-mono text-gray-600 font-bold shrink-0">{subject.hours}h ({subject.value}%)</span>
-                </div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono text-gray-600 font-bold shrink-0">{subject.hours}h ({subject.value}%)</span>
+                    <span className="text-gray-300 group-hover:text-purple-400 transition-colors">→</span>
+                  </div>
+                </button>
               ))}
             </div>
           </div>
