@@ -6,6 +6,8 @@ export interface HeatmapDay {
   hoursFocused: number;
   subject: string;
   summary: string;
+  topicsCovered: string[];
+  questionsSolved: number;
 }
 
 export interface SubjectBreakdown {
@@ -21,6 +23,14 @@ export interface MilestoneProgressData {
   percentage: number;
   activeCourse: string;
 }
+
+// Topics per subject for richer day detail
+const SUBJECT_TOPICS: Record<string, string[]> = {
+  "Data Structures": ["Big-O Analysis", "Binary Trees", "Dynamic Programming", "Graph BFS/DFS", "Hash Maps", "Heaps", "Tries"],
+  "Quantum Physics": ["Wave Functions", "Schrödinger Eq.", "Hilbert Space", "Quantum Gates", "Entanglement", "Tunneling"],
+  "Linear Algebra": ["Eigenvalues", "Matrix Decomp.", "Vector Spaces", "Orthogonality", "SVD", "Projections"],
+  "Machine Learning": ["Gradient Descent", "Backpropagation", "CNNs", "Attention", "Regularization", "Loss Functions"],
+};
 
 // Generate 12-week (84 days) heatmap data for New User (empty) or Demo User
 export function generateMockHeatmapData(isEmpty: boolean = false): HeatmapDay[] {
@@ -40,6 +50,8 @@ export function generateMockHeatmapData(isEmpty: boolean = false): HeatmapDay[] 
         hoursFocused: 0,
         subject: "No Session",
         summary: "No study sessions logged for this day",
+        topicsCovered: [],
+        questionsSolved: 0,
       });
     } else {
       const dayOfWeek = d.getDay();
@@ -48,6 +60,10 @@ export function generateMockHeatmapData(isEmpty: boolean = false): HeatmapDay[] 
 
       const subject = subjects[i % subjects.length];
       const hoursFocused = level === 0 ? 0 : Number((level * 0.8 + 0.5).toFixed(1));
+      const allTopics = SUBJECT_TOPICS[subject] ?? [];
+      const topicCount = level === 0 ? 0 : Math.min(level + 1, allTopics.length);
+      const topicsCovered = allTopics.slice(i % Math.max(allTopics.length - topicCount, 1), (i % Math.max(allTopics.length - topicCount, 1)) + topicCount);
+      const questionsSolved = level === 0 ? 0 : level * 3 + (i % 4);
 
       days.push({
         date: dateStr,
@@ -55,6 +71,8 @@ export function generateMockHeatmapData(isEmpty: boolean = false): HeatmapDay[] 
         hoursFocused,
         subject,
         summary: hoursFocused > 0 ? `${hoursFocused} hours focused on ${subject}` : "No study sessions logged",
+        topicsCovered,
+        questionsSolved,
       });
     }
   }

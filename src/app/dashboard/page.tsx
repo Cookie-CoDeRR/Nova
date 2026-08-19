@@ -18,6 +18,7 @@ export default function StudyPulseDashboardPage() {
   const [isDemoDataLoaded, setIsDemoDataLoaded] = useState(false);
   const [heatmapData, setHeatmapData] = useState<HeatmapDay[]>(generateMockHeatmapData(true));
   const [hoveredDay, setHoveredDay] = useState<HeatmapDay | null>(null);
+  const [clickedDay, setClickedDay] = useState<HeatmapDay | null>(null);
   const [weeklyReport, setWeeklyReport] = useState<string | null>(null);
   const [isReportLoading, setIsReportLoading] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -93,6 +94,11 @@ export default function StudyPulseDashboardPage() {
   };
 
   const subjectBreakdownData = isDemoDataLoaded ? MOCK_SUBJECT_BREAKDOWN_FULL : MOCK_SUBJECT_BREAKDOWN_EMPTY;
+
+  // Find today's heatmap entry for the default right-panel display
+  const todayStr = new Date().toISOString().slice(0, 10); // "YYYY-MM-DD"
+  const todayEntry = heatmapData.find((d) => d.date === todayStr) ?? heatmapData[heatmapData.length - 1];
+  const displayDay = hoveredDay ?? clickedDay ?? todayEntry;
 
   return (
     <div className="w-full max-w-7xl mx-auto space-y-8 font-sans text-gray-800 pb-16">
@@ -298,59 +304,132 @@ export default function StudyPulseDashboardPage() {
 
       {/* 1. Productivity Heatmap Grid Card */}
       <div className="bg-white border border-gray-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-gray-100 pb-4">
+        {/* Header */}
+        <div className="flex items-center gap-2 border-b border-gray-100 pb-4">
+          <Clock className="w-4 h-4 text-purple-700" />
           <div>
-            <h2 className="font-serif text-xl font-bold text-gray-900 flex items-center gap-2">
-              <Clock className="w-4 h-4 text-purple-700" />
-              12-Week Study Productivity Heatmap
-            </h2>
+            <h2 className="font-serif text-xl font-bold text-gray-900">12-Week Study Productivity Heatmap</h2>
             <p className="text-xs text-gray-500">
               {isDemoDataLoaded
                 ? "Each cell represents daily focus timer & Socratic tutor activity"
                 : "No study sessions logged yet. Complete a Pomodoro session to light up your heatmap!"}
             </p>
           </div>
+        </div>
 
-          {/* Tooltip display */}
-          <div className="text-xs font-mono bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5 text-gray-700">
-            {hoveredDay ? (
-              <span className="font-semibold text-purple-900">
-                {hoveredDay.date}: <strong>{hoveredDay.summary}</strong>
-              </span>
+        {/* Three-section layout: Grid | Progress | Activity Log */}
+        <div className="flex items-stretch divide-x divide-gray-100">
+
+          {/* Section 1: Heatmap grid */}
+          <div className="shrink-0 flex flex-col justify-between space-y-2 pr-6">
+            <div className="inline-grid grid-rows-7 grid-flow-col gap-1.5">
+              {heatmapData.map((day, idx) => (
+                <div
+                  key={idx}
+                  onMouseEnter={() => setHoveredDay(day)}
+                  onMouseLeave={() => setHoveredDay(null)}
+                  onClick={() => setClickedDay(clickedDay?.date === day.date ? null : day)}
+                  className={cn(
+                    "w-4 h-4 rounded-sm border transition-transform hover:scale-125 cursor-pointer",
+                    clickedDay?.date === day.date && "ring-2 ring-purple-500 ring-offset-1",
+                    levelColorMap[day.level]
+                  )}
+                />
+              ))}
+            </div>
+            {/* Legend */}
+            <div className="flex items-center gap-1.5 text-[10px] font-mono text-gray-400">
+              <span>Less</span>
+              <div className="w-3 h-3 rounded-sm bg-gray-100 border border-gray-200" />
+              <div className="w-3 h-3 rounded-sm bg-purple-200 border border-purple-300" />
+              <div className="w-3 h-3 rounded-sm bg-purple-300 border border-purple-400" />
+              <div className="w-3 h-3 rounded-sm bg-purple-500 border border-purple-600" />
+              <div className="w-3 h-3 rounded-sm bg-purple-700 border border-purple-800" />
+              <span>More</span>
+            </div>
+          </div>
+
+          {/* Section 2: Day summary */}
+          <div className="w-56 shrink-0 px-6 space-y-2.5 flex flex-col">
+            <div className="text-[10px] font-bold font-mono uppercase tracking-widest text-gray-400">
+              {hoveredDay ? "Hovering" : clickedDay ? "Pinned Log" : "Today's Progress"}
+            </div>
+            <div className="text-lg font-bold text-gray-900 font-serif leading-tight">{displayDay.date}</div>
+            <div className="flex items-center gap-2">
+              <div
+                className="w-2.5 h-2.5 rounded-full shrink-0"
+                style={{
+                  backgroundColor:
+                    displayDay.level === 0 ? "#e5e7eb"
+                    : displayDay.level === 1 ? "#d8b4fe"
+                    : displayDay.level === 2 ? "#c084fc"
+                    : displayDay.level === 3 ? "#a855f7"
+                    : "#7e22ce"
+                }}
+              />
+              <span className="text-xs font-medium text-gray-700 leading-snug">{displayDay.summary}</span>
+            </div>
+            <div className="space-y-1">
+              <div className="text-[10px] font-mono text-gray-400 uppercase tracking-wider">Intensity</div>
+              <div className="flex gap-1 max-w-[160px]">
+                {[1, 2, 3, 4].map((l) => (
+                  <div
+                    key={l}
+                    className="h-1.5 rounded-full flex-1 transition-all"
+                    style={{ backgroundColor: l <= displayDay.level ? "#7C3AED" : "#e5e7eb" }}
+                  />
+                ))}
+              </div>
+              <div className="text-[10px] font-mono text-gray-400">
+                {displayDay.level === 0 ? "No activity logged"
+                 : displayDay.level === 1 ? "Light — under 1h"
+                 : displayDay.level === 2 ? "Moderate — 1–2h"
+                 : displayDay.level === 3 ? "Active — 2–3h"
+                 : "Deep focus — 3h+"}
+              </div>
+            </div>
+          </div>
+
+          {/* Section 3: Activity log rows */}
+          <div className="flex-1 pl-6 pt-1 min-w-0">
+            <div className="flex items-center justify-between mb-2">
+              <div className="text-[10px] font-bold font-mono uppercase tracking-widest text-gray-400">
+                Activity Log
+              </div>
+              {(displayDay.questionsSolved ?? 0) > 0 && (
+                <span className="text-[10px] font-bold font-mono text-purple-700 bg-purple-50 border border-purple-200 px-2 py-0.5 rounded-full">
+                  {displayDay.questionsSolved} Qs solved
+                </span>
+              )}
+            </div>
+
+            {displayDay.topicsCovered && displayDay.topicsCovered.length > 0 ? (
+              <div className="overflow-y-auto max-h-36 space-y-1.5 pr-0.5">
+                {displayDay.topicsCovered.map((topic, i) => (
+                  <button
+                    key={i}
+                    onClick={() => router.push(`/topic-questions?topic=${encodeURIComponent(topic)}&subject=${encodeURIComponent(displayDay.subject)}`)}
+                    className="w-full flex items-center justify-between px-3 py-1.5 rounded-lg bg-gray-50 border border-gray-100 hover:border-purple-300 hover:bg-purple-50 transition-colors group text-left cursor-pointer"
+                  >
+                    <div className="flex items-center gap-2 min-w-0">
+                      <div className="w-1.5 h-1.5 rounded-full bg-purple-400 shrink-0" />
+                      <span className="text-[11px] font-semibold text-gray-800 truncate group-hover:text-purple-700 transition-colors">{topic}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 shrink-0 ml-2">
+                      <span className="text-[10px] font-mono text-gray-400">{displayDay.subject}</span>
+                      <span className="text-gray-300 group-hover:text-purple-400 transition-colors text-xs">→</span>
+                    </div>
+                  </button>
+                ))}
+              </div>
             ) : (
-              <span className="text-gray-400">Hover over any square to view daily focus log</span>
+              <p className="text-[10px] font-mono text-gray-400 italic pt-1">No activity logged this day</p>
             )}
           </div>
-        </div>
 
-        {/* Grid */}
-        <div className="overflow-x-auto pb-2">
-          <div className="inline-grid grid-rows-7 grid-flow-col gap-1.5 pt-2">
-            {heatmapData.map((day, idx) => (
-              <div
-                key={idx}
-                onMouseEnter={() => setHoveredDay(day)}
-                onMouseLeave={() => setHoveredDay(null)}
-                className={cn(
-                  "w-4 h-4 rounded-sm border transition-transform hover:scale-125 cursor-pointer",
-                  levelColorMap[day.level]
-                )}
-                title={`${day.date}: ${day.summary}`}
-              />
-            ))}
-          </div>
-        </div>
-
-        <div className="flex items-center justify-end gap-2 text-[11px] font-mono text-gray-500 pt-1">
-          <span>Less</span>
-          <div className="w-3 h-3 rounded-sm bg-gray-100 border border-gray-200" />
-          <div className="w-3 h-3 rounded-sm bg-purple-200 border border-purple-300" />
-          <div className="w-3 h-3 rounded-sm bg-purple-300 border border-purple-400" />
-          <div className="w-3 h-3 rounded-sm bg-purple-500 border border-purple-600" />
-          <div className="w-3 h-3 rounded-sm bg-purple-700 border border-purple-800" />
-          <span>More</span>
         </div>
       </div>
+
 
       {/* 2. Focus Time Breakdown & Syllabus Milestones */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
