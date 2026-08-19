@@ -15,8 +15,9 @@ export default function RootLayout({
   const [isFocusModeActive, setIsFocusModeActive] = useState(false);
   const pathname = usePathname();
 
-  // FloatingNav and TopHeader should ONLY render inside the main authenticated app routes
+  // FloatingNav and TopHeader should render inside the main authenticated app routes
   const isMainAppRoute = pathname === "/dashboard" || pathname === "/tutor" || pathname === "/brain";
+  const showFloatingNav = pathname === "/dashboard" || pathname === "/brain";
 
   return (
     <html lang="en">
@@ -34,12 +35,12 @@ export default function RootLayout({
         )}
 
         {/* Main Content Viewport */}
-        <main className={isMainAppRoute ? "relative z-10 pb-28 pt-4 px-4 sm:px-8 max-w-7xl mx-auto min-h-[calc(100vh-160px)]" : "relative z-10"}>
+        <main className={isMainAppRoute ? (showFloatingNav ? "relative z-10 pb-28 pt-4 px-4 sm:px-8 max-w-7xl mx-auto min-h-[calc(100vh-160px)]" : "relative z-10 pb-8 pt-4 px-4 sm:px-8 max-w-7xl mx-auto min-h-[calc(100vh-160px)]") : "relative z-10"}>
           {children}
         </main>
 
-        {/* Floating Glass Pill Navigation (Main App Only) */}
-        {isMainAppRoute && (
+        {/* Floating Glass Pill Navigation (Main App Only, excluding tutor) */}
+        {showFloatingNav && (
           <FloatingNav
             isFocusModeActive={isFocusModeActive}
             onToggleFocusMode={() => setIsFocusModeActive((prev) => !prev)}
