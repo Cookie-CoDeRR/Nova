@@ -46,6 +46,21 @@ export default function TutorPage() {
     setShowChips(isAtBottom);
   };
 
+  useEffect(() => {
+    const handleWindowScroll = () => {
+      const scrollTop = window.scrollY || document.documentElement.scrollTop;
+      const windowHeight = window.innerHeight;
+      const docHeight = document.documentElement.scrollHeight;
+      
+      // If we are within 100px of the bottom, show the chips. Otherwise hide.
+      const isNearBottom = docHeight - (scrollTop + windowHeight) < 100;
+      setShowChips(isNearBottom);
+    };
+
+    window.addEventListener("scroll", handleWindowScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleWindowScroll);
+  }, []);
+
   const handleSubmit = async (textToSend?: string) => {
     const messageContent = textToSend || input;
     if (!messageContent.trim() || isLoading) return;
@@ -140,10 +155,10 @@ export default function TutorPage() {
 
   return (
     <div className="min-h-[calc(100vh-140px)] bg-[#FAFAFA] text-gray-700 flex flex-col justify-between items-center py-6 px-4 font-sans">
-      
+
       {/* Centered Document-Style Container (max-w-3xl) */}
       <div className="w-full max-w-3xl flex-1 flex flex-col justify-between space-y-6">
-        
+
         {/* Top Header Card */}
         <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -232,8 +247,8 @@ export default function TutorPage() {
         </div>
 
         {/* Quick Action Chips & Floating Command Bar Input */}
-        <div className="sticky bottom-0 pt-3 pb-4 bg-[#FAFAFA] space-y-3 w-full">
-          
+        <div className="sticky bottom-4 pt-4 bg-gradient-to-t from-[#FAFAFA] via-[#FAFAFA]/90 to-transparent space-y-3">
+
           {/* Quick Action Chips Row */}
           <AnimatePresence initial={false}>
             {showChips && (
