@@ -1,10 +1,12 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
+import Link from "next/link";
 import ReactMarkdown from "react-markdown";
-import { Send, Sparkles, Bot, User, Trash2 } from "lucide-react";
+import { Send, Sparkles, Bot, User, Trash2, BarChart2, Brain } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { NovaLogo } from "@/components/ui/NovaLogo";
 
 interface Message {
   id: string;
@@ -273,8 +275,36 @@ export default function TutorPage() {
             )}
           </AnimatePresence>
 
-          {/* Floating Command Bar Input Area */}
-          <div className="relative flex items-center p-2.5 rounded-2xl bg-white border border-gray-200 shadow-md focus-within:border-gray-400 transition-all">
+          {/* Floating Command Bar Input Area with Merged Navigation */}
+          <div className="relative flex items-center p-1.5 sm:p-2 rounded-2xl bg-white border border-gray-200 shadow-md focus-within:border-purple-300 focus-within:ring-2 focus-within:ring-purple-100 transition-all">
+            
+            {/* Merged Navigation Shortcuts */}
+            <div className="flex items-center gap-1 sm:gap-1.5 px-2 border-r border-gray-100 shrink-0">
+              {/* Logo icon leading to dashboard */}
+              <Link href="/dashboard" className="p-1 rounded-lg hover:bg-gray-50 transition-colors shrink-0" title="Home Dashboard">
+                <NovaLogo size="sm" iconOnly={true} />
+              </Link>
+              
+              {/* Study Pulse Icon */}
+              <Link
+                href="/dashboard"
+                className="p-1.5 rounded-lg text-gray-400 hover:text-purple-600 hover:bg-purple-50 transition-colors shrink-0"
+                title="Study Pulse Dashboard"
+              >
+                <BarChart2 className="w-4 h-4" />
+              </Link>
+
+              {/* Knowledge Base Icon */}
+              <Link
+                href="/brain"
+                className="p-1.5 rounded-lg text-gray-400 hover:text-purple-600 hover:bg-purple-50 transition-colors shrink-0"
+                title="Knowledge Base"
+              >
+                <Brain className="w-4 h-4" />
+              </Link>
+            </div>
+
+            {/* Input field */}
             <textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
@@ -282,14 +312,15 @@ export default function TutorPage() {
               placeholder="Ask NOVA a question... (Press Enter to send)"
               rows={1}
               disabled={isLoading}
-              className="w-full bg-transparent text-sm text-gray-900 placeholder-gray-400 px-3 py-2 focus:outline-none resize-none max-h-32 min-h-[44px] font-medium"
+              className="w-full bg-transparent text-sm text-gray-900 placeholder-gray-400 px-3 py-2 focus:outline-none resize-none max-h-32 min-h-[40px] font-medium"
             />
 
+            {/* Send button */}
             <button
               onClick={() => handleSubmit()}
               disabled={!input.trim() || isLoading}
               className={cn(
-                "p-3 rounded-xl transition-all shrink-0 flex items-center justify-center ml-1",
+                "p-3 rounded-xl transition-all shrink-0 flex items-center justify-center ml-1 cursor-pointer",
                 input.trim() && !isLoading
                   ? "bg-gray-900 text-white shadow-xs hover:bg-gray-800 scale-105"
                   : "bg-gray-100 text-gray-400 cursor-not-allowed"
