@@ -232,7 +232,7 @@ export default function TutorPage() {
         </div>
 
         {/* Quick Action Chips & Floating Command Bar Input */}
-        <div className="sticky bottom-4 pt-4 bg-gradient-to-t from-[#FAFAFA] via-[#FAFAFA]/90 to-transparent space-y-3">
+        <div className="sticky bottom-0 pt-3 pb-4 bg-[#FAFAFA] space-y-3 w-full">
           
           {/* Quick Action Chips Row */}
           <AnimatePresence initial={false}>
