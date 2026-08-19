@@ -112,8 +112,8 @@ Student Query: "${userQuery}"`;
         },
       });
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error in /api/chat route:", error);
-    return NextResponse.json({ error: "Failed to process tutor chat stream" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to process tutor chat stream", details: error.message || error.toString() }, { status: 500 });
   }
 }

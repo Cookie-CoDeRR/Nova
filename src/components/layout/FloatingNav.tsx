@@ -87,24 +87,6 @@ export function FloatingNav({ onToggleFocusMode, isFocusModeActive }: FloatingNa
           })}
         </div>
 
-        {/* Focus Mode Quick Action Button */}
-        {onToggleFocusMode && (
-          <div className="pl-1.5 sm:pl-2 border-l border-gray-200 flex items-center gap-1 shrink-0">
-            <button
-              onClick={onToggleFocusMode}
-              className={cn(
-                "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all duration-300 border cursor-pointer",
-                isFocusModeActive
-                  ? "bg-amber-100 text-amber-900 border-amber-300 shadow-sm animate-pulse"
-                  : "bg-gray-100 text-gray-700 border-gray-200 hover:bg-gray-200"
-              )}
-              title="Toggle Focus Mode Pomodoro"
-            >
-              <Target className={cn("w-3.5 h-3.5", isFocusModeActive ? "text-amber-600" : "text-gray-500")} />
-              <span className="hidden sm:inline">Focus</span>
-            </button>
-          </div>
-        )}
       </motion.nav>
     </div>
   );

@@ -132,7 +132,7 @@ export function StatProgressModal({ statKey, currentValue, onClose }: StatProgre
     return () => document.body.classList.remove("stat-modal-open");
   }, []);
 
-  const data = period === "week" ? cfg.weeklyData : cfg.monthlyData;
+  const data = (period === "week" ? cfg.weeklyData : cfg.monthlyData) as any[];
   const xKey = period === "week" ? cfg.weeklyXKey : cfg.monthlyXKey;
 
   // Summary stats

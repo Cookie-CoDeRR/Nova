@@ -73,7 +73,17 @@ export default function TutorPage() {
       });
 
       if (!response.ok || !response.body) {
-        throw new Error("Failed to start response stream");
+        const errorData = await response.json().catch(() => ({}));
+        const errorMsg = errorData.details || errorData.error || "Failed to start response stream";
+        setMessages((prev) =>
+          prev.map((msg) =>
+            msg.id === assistantId
+              ? { ...msg, content: `Error: ${errorMsg}. Please check your API key configuration.` }
+              : msg
+          )
+        );
+        setIsLoading(false);
+        return;
       }
 
       const reader = response.body.getReader();

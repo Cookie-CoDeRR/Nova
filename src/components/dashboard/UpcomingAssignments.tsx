@@ -11,7 +11,7 @@ const SAMPLE_ASSIGNMENTS: Assignment[] = [
     id: "a1",
     title: "Programming Assignment 3: Red-Black Tree Rotations",
     dueDate: new Date(Date.now() + 2 * 86400000).toISOString(),
-    priority: "HIGH",
+    urgency: "HIGH",
     completed: false,
     courseId: "c1",
     course: { id: "c1", code: "CS 301", name: "Data Structures & Algorithms", color: "#7C3AED" },
@@ -20,7 +20,7 @@ const SAMPLE_ASSIGNMENTS: Assignment[] = [
     id: "a2",
     title: "Quantum Physics Problem Set 5: Infinite Square Wells",
     dueDate: new Date(Date.now() + 4 * 86400000).toISOString(),
-    priority: "MEDIUM",
+    urgency: "MEDIUM",
     completed: false,
     courseId: "c2",
     course: { id: "c2", code: "PHYS 202", name: "Quantum Physics", color: "#3B82F6" },
@@ -29,7 +29,7 @@ const SAMPLE_ASSIGNMENTS: Assignment[] = [
     id: "a3",
     title: "Linear Algebra Exam 2 Study Guide Review",
     dueDate: new Date(Date.now() + 6 * 86400000).toISOString(),
-    priority: "LOW",
+    urgency: "LOW",
     completed: false,
     courseId: "c3",
     course: { id: "c3", code: "MATH 240", name: "Linear Algebra", color: "#10B981" },
@@ -38,7 +38,7 @@ const SAMPLE_ASSIGNMENTS: Assignment[] = [
 
 export function UpcomingAssignments() {
   const [assignments, setAssignments] = useState<Assignment[]>(SAMPLE_ASSIGNMENTS);
-  const [filterPriority, setFilterPriority] = useState<string>("ALL");
+  const [filterUrgency, setFilterUrgency] = useState<string>("ALL");
 
   const toggleComplete = (id: string) => {
     setAssignments((prev) =>
@@ -47,8 +47,8 @@ export function UpcomingAssignments() {
   };
 
   const filteredAssignments = assignments.filter((a) => {
-    if (filterPriority === "ALL") return true;
-    return a.priority === filterPriority;
+    if (filterUrgency === "ALL") return true;
+    return a.urgency === filterUrgency;
   });
 
   return (
@@ -66,18 +66,18 @@ export function UpcomingAssignments() {
           </div>
 
           <div className="flex items-center gap-1 p-1 rounded-xl bg-gray-50 border border-gray-200 text-xs">
-            {["ALL", "HIGH", "MEDIUM", "LOW"].map((p) => (
+            {["ALL", "HIGH", "MEDIUM", "LOW"].map((u) => (
               <button
-                key={p}
-                onClick={() => setFilterPriority(p)}
+                key={u}
+                onClick={() => setFilterUrgency(u)}
                 className={cn(
                   "px-2.5 py-1 rounded-lg font-bold transition-all text-[11px]",
-                  filterPriority === p
+                  filterUrgency === u
                     ? "bg-gray-900 text-white shadow-xs"
                     : "text-gray-600 hover:text-gray-900"
                 )}
               >
-                {p}
+                {u}
               </button>
             ))}
           </div>
@@ -85,8 +85,8 @@ export function UpcomingAssignments() {
 
         <div className="space-y-3">
           {filteredAssignments.map((item) => {
-            const isHigh = item.priority === "HIGH";
-            const isMed = item.priority === "MEDIUM";
+            const isHigh = item.urgency === "HIGH";
+            const isMed = item.urgency === "MEDIUM";
 
             return (
               <div
@@ -124,7 +124,7 @@ export function UpcomingAssignments() {
                             : "bg-gray-100 text-gray-700 border-gray-200"
                         )}
                       >
-                        {item.priority} PRIORITY
+                        {item.urgency} PRIORITY
                       </span>
                     </div>
 

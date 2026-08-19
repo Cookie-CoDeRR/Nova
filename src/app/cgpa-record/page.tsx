@@ -243,7 +243,7 @@ export default function CgpaRecordPage() {
               <YAxis domain={[6, 10]} tick={{ fontSize: 10, fill: "#9CA3AF" }} axisLine={false} tickLine={false} />
               <Tooltip
                 contentStyle={{ borderRadius: "12px", border: "1px solid #e5e7eb", fontSize: "11px" }}
-                formatter={(v: number) => [v.toFixed(1), "SGPA"]}
+                formatter={(v: any) => [Number(v).toFixed(1), "SGPA"]}
               />
               <ReferenceLine y={cgpa} stroke="#7C3AED" strokeDasharray="4 4" strokeWidth={1.5} label={{ value: "CGPA", position: "right", fontSize: 10, fill: "#7C3AED" }} />
               <Line
