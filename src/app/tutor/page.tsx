@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import ReactMarkdown from "react-markdown";
 import { Send, Sparkles, Bot, User, Trash2 } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 interface Message {
@@ -29,6 +29,7 @@ export default function TutorPage() {
   ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [showChips, setShowChips] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -38,6 +39,12 @@ export default function TutorPage() {
   useEffect(() => {
     scrollToBottom();
   }, [messages, isLoading]);
+
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const target = e.currentTarget;
+    const isAtBottom = target.scrollHeight - target.scrollTop - target.clientHeight < 30;
+    setShowChips(isAtBottom);
+  };
 
   const handleSubmit = async (textToSend?: string) => {
     const messageContent = textToSend || input;
@@ -165,7 +172,7 @@ export default function TutorPage() {
         </div>
 
         {/* Chat Messages List */}
-        <div className="flex-1 space-y-6 overflow-y-auto pr-1 py-2">
+        <div onScroll={handleScroll} className="flex-1 space-y-6 overflow-y-auto pr-1 py-2">
           {messages.map((msg) => {
             const isUser = msg.role === "user";
 
@@ -228,18 +235,28 @@ export default function TutorPage() {
         <div className="sticky bottom-4 pt-4 bg-gradient-to-t from-[#FAFAFA] via-[#FAFAFA]/90 to-transparent space-y-3">
           
           {/* Quick Action Chips Row */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
-            {QUICK_CHIPS.map((chip) => (
-              <button
-                key={chip.id}
-                disabled={isLoading}
-                onClick={() => handleSubmit(chip.prompt)}
-                className="shrink-0 bg-white border border-gray-200 hover:border-gray-400 hover:bg-gray-50 rounded-full text-xs font-semibold px-4 py-2 text-gray-700 transition-all duration-200 shadow-2xs"
+          <AnimatePresence initial={false}>
+            {showChips && (
+              <motion.div
+                initial={{ opacity: 0, height: 0, y: 8 }}
+                animate={{ opacity: 1, height: "auto", y: 0 }}
+                exit={{ opacity: 0, height: 0, y: 8 }}
+                transition={{ duration: 0.2, ease: "easeInOut" }}
+                className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar overflow-hidden shrink-0"
               >
-                {chip.label}
-              </button>
-            ))}
-          </div>
+                {QUICK_CHIPS.map((chip) => (
+                  <button
+                    key={chip.id}
+                    disabled={isLoading}
+                    onClick={() => handleSubmit(chip.prompt)}
+                    className="shrink-0 bg-white border border-gray-200 hover:border-gray-400 hover:bg-gray-50 rounded-full text-xs font-semibold px-4 py-2 text-gray-700 transition-all duration-200 shadow-2xs cursor-pointer"
+                  >
+                    {chip.label}
+                  </button>
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* Floating Command Bar Input Area */}
           <div className="relative flex items-center p-2.5 rounded-2xl bg-white border border-gray-200 shadow-md focus-within:border-gray-400 transition-all">
