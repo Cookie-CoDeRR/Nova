@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { Flame, Bell, Sparkles, GraduationCap, BookOpen, CheckCircle2, AlertCircle, Info, X, Settings, LogOut } from "lucide-react";
 import { getStudentProfile, StudentProfile, NEW_USER_PROFILE } from "@/lib/userProfile";
 import { EditProfileModal } from "@/components/dashboard/EditProfileModal";
@@ -76,6 +77,7 @@ const MOCK_NOTIFICATIONS = [
 ];
 
 export function TopHeader({ urgentCount = 2 }: TopHeaderProps) {
+  const router = useRouter();
   const [greeting, setGreeting] = useState("Good evening");
   const [profile, setProfile] = useState<StudentProfile>(NEW_USER_PROFILE);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -175,11 +177,15 @@ export function TopHeader({ urgentCount = 2 }: TopHeaderProps) {
             <span>{profile.streakDays || 0}d Streak</span>
           </div>
 
-          {/* GPA Badge */}
-          <div className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-purple-50 border border-purple-200 text-purple-900 text-[11px] font-bold shadow-xs">
+          {/* CGPA Badge — clickable */}
+          <button
+            onClick={() => router.push("/cgpa-record")}
+            className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-purple-50 border border-purple-200 text-purple-900 text-[11px] font-bold shadow-xs hover:bg-purple-100 hover:border-purple-300 transition-all cursor-pointer"
+            title="View CGPA record by semester"
+          >
             <GraduationCap className="w-3.5 h-3.5 text-purple-600" />
-            <span>GPA: {(profile.gpa || 0).toFixed(2)}</span>
-          </div>
+            <span>CGPA: {(profile.gpa || 0).toFixed(2)}</span>
+          </button>
 
           {/* Notification Bell */}
           <button
