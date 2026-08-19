@@ -282,7 +282,7 @@ export default function TutorPage() {
             <div className="flex items-center gap-1 sm:gap-1.5 px-2 border-r border-gray-100 shrink-0">
               {/* Logo icon leading to dashboard */}
               <Link href="/dashboard" className="p-1 rounded-lg hover:bg-gray-50 transition-colors shrink-0" title="Home Dashboard">
-                <NovaLogo size="sm" iconOnly={true} />
+                <NovaLogo size="sm" iconOnly={true} href="" />
               </Link>
               
               {/* Study Pulse Icon */}
