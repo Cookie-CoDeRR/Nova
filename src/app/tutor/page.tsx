@@ -276,15 +276,50 @@ export default function TutorPage() {
           </AnimatePresence>
 
           {/* Floating Command Bar Input Area with Merged Navigation */}
-          <div className="relative flex items-center p-1.5 sm:p-2 rounded-2xl bg-white border border-gray-200 shadow-md focus-within:border-purple-300 focus-within:ring-2 focus-within:ring-purple-100 transition-all">
+          <div className="relative flex items-center justify-center w-full p-1.5 sm:p-2 rounded-2xl bg-white border border-gray-200 shadow-md focus-within:border-purple-300 focus-within:ring-2 focus-within:ring-purple-100 transition-all">
             
-            {/* Merged Navigation Shortcuts */}
-            <div className="flex items-center gap-1 sm:gap-1.5 px-2 border-r border-gray-100 shrink-0">
-              {/* Logo icon leading to dashboard */}
+            {/* Left: Logo */}
+            <div className="flex items-center px-2 border-r border-gray-100 shrink-0">
               <Link href="/dashboard" className="p-1 rounded-lg hover:bg-gray-50 transition-colors shrink-0" title="Home Dashboard">
                 <NovaLogo size="sm" iconOnly={true} href="" />
               </Link>
-              
+            </div>
+
+            {/* Input field (Animated Entrance) */}
+            <motion.div
+              initial={{ flex: 0, opacity: 0, width: 0 }}
+              animate={{ flex: 1, opacity: 1, width: "100%" }}
+              transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+              className="min-w-0 overflow-hidden"
+            >
+              <textarea
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="Ask NOVA a question... (Press Enter to send)"
+                rows={1}
+                disabled={isLoading}
+                className="w-full bg-transparent text-sm text-gray-900 placeholder-gray-400 px-3 py-2.5 focus:outline-none resize-none max-h-32 min-h-[40px] font-medium"
+                style={{ lineHeight: "20px" }}
+              />
+            </motion.div>
+
+            {/* Send button */}
+            <button
+              onClick={() => handleSubmit()}
+              disabled={!input.trim() || isLoading}
+              className={cn(
+                "p-3 rounded-xl transition-all shrink-0 flex items-center justify-center mr-2 cursor-pointer",
+                input.trim() && !isLoading
+                  ? "bg-gray-900 text-white shadow-xs hover:bg-gray-800 scale-105"
+                  : "bg-gray-100 text-gray-400 cursor-not-allowed"
+              )}
+            >
+              <Send className="w-4 h-4" />
+            </button>
+
+            {/* Right: Nav icons */}
+            <div className="flex items-center gap-1 shrink-0 px-1 border-l border-gray-100">
               {/* Study Pulse Icon */}
               <Link
                 href="/dashboard"
@@ -303,31 +338,6 @@ export default function TutorPage() {
                 <Brain className="w-4 h-4" />
               </Link>
             </div>
-
-            {/* Input field */}
-            <textarea
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder="Ask NOVA a question... (Press Enter to send)"
-              rows={1}
-              disabled={isLoading}
-              className="w-full bg-transparent text-sm text-gray-900 placeholder-gray-400 px-3 py-2 focus:outline-none resize-none max-h-32 min-h-[40px] font-medium"
-            />
-
-            {/* Send button */}
-            <button
-              onClick={() => handleSubmit()}
-              disabled={!input.trim() || isLoading}
-              className={cn(
-                "p-3 rounded-xl transition-all shrink-0 flex items-center justify-center ml-1 cursor-pointer",
-                input.trim() && !isLoading
-                  ? "bg-gray-900 text-white shadow-xs hover:bg-gray-800 scale-105"
-                  : "bg-gray-100 text-gray-400 cursor-not-allowed"
-              )}
-            >
-              <Send className="w-4 h-4" />
-            </button>
           </div>
         </div>
 
