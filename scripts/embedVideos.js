@@ -74,7 +74,7 @@ async function main() {
       existing.forEach(v => {
         if (v.videoId && Array.isArray(v.embedding)) {
           existingVectorsMap.set(v.videoId, v.embedding);
-          vectors.push(v); // Keep existing vectors
+          vectors.push(v); // Keep existing vectors in memory
         }
       });
       console.log(`Loaded ${existingVectorsMap.size} existing vectors.`);
@@ -89,88 +89,73 @@ async function main() {
 
   if (pendingVideos.length === 0) {
     console.log('All videos are already embedded. Saving current database...');
-    // Ensure file exists just in case
     fs.writeFileSync(outputPath, JSON.stringify(vectors, null, 2), 'utf8');
     console.log('Database is up to date.');
     process.exit(0);
   }
 
-  const BATCH_SIZE = 50;
-  console.log(`Starting batch embeddings generation (Batch Size: ${BATCH_SIZE})...`);
+  // Under free tier, limit is 15 requests per minute.
+  // 60 seconds / 14 requests = ~4.3 seconds delay to guarantee no 429s.
+  const DELAY_MS = 4300;
+  console.log(`Starting individual embedding generation with rate-limit protection (${DELAY_MS}ms delay)...`);
 
-  for (let i = 0; i < pendingVideos.length; i += BATCH_SIZE) {
-    const batch = pendingVideos.slice(i, i + BATCH_SIZE);
-    console.log(`\nProcessing batch [${Math.floor(i / BATCH_SIZE) + 1}/${Math.ceil(pendingVideos.length / BATCH_SIZE)}] (${batch.length} videos)...`);
+  for (let i = 0; i < pendingVideos.length; i++) {
+    const video = pendingVideos[i];
+    const textToEmbed = `${video.title || ''}\n\n${video.description || ''}`.trim() || 'No title';
 
-    const batchTexts = batch.map(video => {
-      return `${video.title || ''}\n\n${video.description || ''}`.trim() || 'No title';
-    });
+    console.log(`[${i + 1}/${pendingVideos.length}] Embedding: "${video.title.substring(0, 50)}..."`);
 
-    try {
-      const res = await ai.models.embedContent({
-        model: 'gemini-embedding-2',
-        contents: batchTexts
-      });
+    let success = false;
+    let attempts = 0;
 
-      const embeddings = res.embeddings;
-      if (embeddings && Array.isArray(embeddings)) {
-        embeddings.forEach((emb, index) => {
-          const video = batch[index];
-          if (emb && Array.isArray(emb.values)) {
-            vectors.push({
-              videoId: video.videoId,
-              embedding: emb.values
-            });
-          } else {
-            console.error(`Failed to extract values for index ${index} (${video.title})`);
-          }
-        });
-        console.log(`Successfully embedded batch of ${batch.length} videos.`);
-      } else {
-        console.error('Failed to get embeddings array in response structure:', JSON.stringify(res));
-      }
-    } catch (err) {
-      console.error(`Batch processing failed: ${err.message}`);
-      console.log('Retrying batch in 5 seconds...');
-      await new Promise(resolve => setTimeout(resolve, 5000));
-      
+    while (!success && attempts < 3) {
+      attempts++;
       try {
         const res = await ai.models.embedContent({
           model: 'gemini-embedding-2',
-          contents: batchTexts
+          contents: textToEmbed
         });
-        const embeddings = res.embeddings;
-        if (embeddings && Array.isArray(embeddings)) {
-          embeddings.forEach((emb, index) => {
-            const video = batch[index];
-            if (emb && Array.isArray(emb.values)) {
-              vectors.push({
-                videoId: video.videoId,
-                embedding: emb.values
-              });
-            }
+
+        // gemini-embedding-2 returns embeddings array
+        const values = res.embeddings?.[0]?.values || res.embedding?.values;
+        if (values && Array.isArray(values)) {
+          vectors.push({
+            videoId: video.videoId,
+            embedding: values
           });
-          console.log(`Successfully embedded batch on retry.`);
+          success = true;
+        } else {
+          console.error(`Failed to parse embedding values for video ${video.videoId}. Structure:`, JSON.stringify(res));
+          break; // Don't retry parsing failure
         }
-      } catch (retryErr) {
-        console.error(`Retry failed: ${retryErr.message}. Skipping this batch.`);
+      } catch (err) {
+        console.error(`Attempt ${attempts} failed for video ${video.videoId}: ${err.message}`);
+        if (attempts < 3) {
+          console.log('Waiting 10 seconds before retrying...');
+          await new Promise(resolve => setTimeout(resolve, 10000));
+        }
       }
     }
 
-    // Save vectors database checkpoint after each batch
-    try {
-      const outputDir = path.dirname(outputPath);
-      if (!fs.existsSync(outputDir)) {
-        fs.mkdirSync(outputDir, { recursive: true });
+    if (success) {
+      // Save checkpoint after every successful embedding
+      try {
+        const outputDir = path.dirname(outputPath);
+        if (!fs.existsSync(outputDir)) {
+          fs.mkdirSync(outputDir, { recursive: true });
+        }
+        fs.writeFileSync(outputPath, JSON.stringify(vectors, null, 2), 'utf8');
+      } catch (saveErr) {
+        console.error(`Failed to save checkpoint: ${saveErr.message}`);
       }
-      fs.writeFileSync(outputPath, JSON.stringify(vectors, null, 2), 'utf8');
-      console.log(`Saved checkpoint: ${vectors.length} total vectors stored.`);
-    } catch (saveErr) {
-      console.error(`Failed to save checkpoint: ${saveErr.message}`);
+    } else {
+      console.error(`Failed to embed video ${video.videoId} after 3 attempts. Skipping.`);
     }
 
-    // Rate-limit throttle (3 seconds sleep between batches to avoid 429)
-    await new Promise(resolve => setTimeout(resolve, 3000));
+    // Rate-limit safety delay
+    if (i < pendingVideos.length - 1) {
+      await new Promise(resolve => setTimeout(resolve, DELAY_MS));
+    }
   }
 
   console.log(`\nSuccess! Vector database now contains ${vectors.length} video records.`);
