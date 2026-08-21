@@ -70,7 +70,7 @@ export async function GET(req: Request) {
       // Generate embedding for query
       const ai = new GoogleGenAI({ apiKey });
       const embedResponse = await ai.models.embedContent({
-        model: 'text-embedding-004',
+        model: 'gemini-embedding-2',
         contents: query,
       });
 

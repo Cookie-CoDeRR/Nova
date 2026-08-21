@@ -1,10 +1,18 @@
 [
   {
-    "id": "PLbRMhDVUMngfdzeoLiTq0O6M9k1u7_s8c",
-    "courseName": "Database Management Systems"
+    "id": "PLp6ek2hDcoNB_YJCruBFjhF79f5ZHyBuz",
+    "courseName": "An Introduction to Artificial Intelligence"
   },
   {
-    "id": "PLgQdku8TdMymUv9A6N74qWmsJ2w3D11zH",
-    "courseName": "Computer Networks"
+    "id": "PLp6ek2hDcoNBVi0ffE1OySkSaPYk4ZU83",
+    "courseName": "Natural Language Processing (NLP)"
+  },
+  {
+    "id": "PLqu1LEUz3ju04dXn0JOgKYPHHnV2at-lG",
+    "courseName": "Programming In Modern C++"
+  },
+  {
+    "id": "PLp6ek2hDcoNDLsGbv_WLAiYAplHoSuH5M",
+    "courseName": "IIT Delhi Lecture Series"
   }
 ]

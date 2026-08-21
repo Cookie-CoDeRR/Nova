@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, Sparkles, Play, ArrowRight, BookOpen, AlertCircle, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
+import { getStudentProfile, StudentProfile } from '@/lib/userProfile';
 
 interface Video {
   title: string;
@@ -25,6 +26,9 @@ export default function NptelSearchPage() {
   const [searched, setSearched] = useState(false);
   const [searchMode, setSearchMode] = useState<'keyword' | 'semantic' | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [profile, setProfile] = useState<any>(null);
+  const [recommendations, setRecommendations] = useState<Video[]>([]);
+  const [recLoading, setRecLoading] = useState(false);
 
   // Fetch all videos on mount
   const fetchAllVideos = async () => {
@@ -43,8 +47,32 @@ export default function NptelSearchPage() {
     }
   };
 
+  const fetchRecommendations = async (studentProfile: any) => {
+    setRecLoading(true);
+    try {
+      // Find a target keywords/goal from studentProfile
+      const targetQuery = studentProfile.specializations?.[0] || studentProfile.primaryGoal || 'programming';
+      
+      const res = await fetch(`/api/nptel/search?q=${encodeURIComponent(targetQuery)}&type=semantic`);
+      if (res.ok) {
+        const data = await res.json();
+        setRecommendations(data.slice(0, 3));
+      }
+    } catch (err) {
+      console.error('Failed to load recommendations:', err);
+    } finally {
+      setRecLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchAllVideos();
+    getStudentProfile().then((p: any) => {
+      setProfile(p);
+      if (p) {
+        fetchRecommendations(p);
+      }
+    });
   }, []);
 
   const handleSearch = useCallback(async (e?: React.FormEvent) => {
@@ -211,7 +239,95 @@ export default function NptelSearchPage() {
           </div>
         )}
 
+        {/* Recommended Videos (based on user profile targets) */}
+        {!searched && recommendations.length > 0 && (
+          <div className="mb-10">
+            <div className="flex items-center gap-2 mb-4">
+              <Sparkles className="w-5 h-5 text-[#7C3AED] fill-[#7C3AED]/10 animate-pulse" />
+              <h2 className="text-lg font-bold text-[#1E1B4B]">Recommended for Your Goal</h2>
+              {profile?.primaryGoal && (
+                <span className="text-xs text-slate-400 font-normal hidden sm:inline">
+                  — based on: "{profile.primaryGoal.length > 50 ? profile.primaryGoal.substring(0, 50) + '...' : profile.primaryGoal}"
+                </span>
+              )}
+            </div>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {recommendations.map((video, idx) => (
+                <motion.div
+                  key={`rec-${video.videoId}`}
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0, transition: { delay: idx * 0.1 } }}
+                  whileHover={{ y: -4, transition: { duration: 0.2 } }}
+                  className="bg-white rounded-2xl border-2 border-purple-100 shadow-xs overflow-hidden flex flex-col group hover:shadow-md hover:border-purple-200 transition-all duration-300 relative"
+                >
+                  {/* Thumbnail */}
+                  <div className="relative aspect-video w-full overflow-hidden bg-slate-100">
+                    {video.thumbnail ? (
+                      <img
+                        src={video.thumbnail}
+                        alt={video.title}
+                        className="object-cover w-full h-full group-hover:scale-103 transition-transform duration-500"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-slate-300 bg-slate-50">
+                        <Play className="w-8 h-8 opacity-40" />
+                      </div>
+                    )}
+                    
+                    {/* Course Badge */}
+                    <span className="absolute top-2 left-2 bg-[#7C3AED] text-white text-[10px] font-semibold px-2.5 py-0.5 rounded-full shadow-sm max-w-[85%] truncate">
+                      {video.courseName}
+                    </span>
+                    
+                    {/* Target Match Badge */}
+                    <span className="absolute bottom-2 right-2 bg-slate-900/80 text-white text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md backdrop-blur-xs">
+                      Target Match
+                    </span>
+                  </div>
+
+                  {/* Metadata & Title */}
+                  <div className="p-5 flex-1 flex flex-col justify-between">
+                    <div>
+                      <h3 className="font-bold text-sm leading-snug text-[#1E1B4B] line-clamp-2 mb-2 group-hover:text-[#7C3AED] transition-colors" title={video.title}>
+                        {video.title}
+                      </h3>
+                      <p className="text-xs text-slate-400 line-clamp-3 leading-relaxed mb-4">
+                        {video.description || "No description provided."}
+                      </p>
+                    </div>
+
+                    <a
+                      href={video.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-auto pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-[#7C3AED] group/link"
+                    >
+                      <span className="flex items-center gap-1.5">
+                        <Play className="w-3.5 h-3.5 fill-[#7C3AED]" />
+                        Watch on YouTube
+                      </span>
+                      <ArrowRight className="w-4 h-4 transition-transform group-hover/link:translate-x-1" />
+                    </a>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+            
+            {/* Divider */}
+            <div className="border-t border-slate-200/60 my-10" />
+          </div>
+        )}
+
         {/* Video Grid */}
+        <div className="flex items-center gap-2 mb-4">
+          <BookOpen className="w-5 h-5 text-slate-500" />
+          <h2 className="text-lg font-bold text-[#1E1B4B]">
+            {searched ? 'Search Results' : 'Complete Lecture Catalog'}
+          </h2>
+        </div>
+
         {initialLoading ? (
           <div className="flex flex-col items-center justify-center py-24 gap-4">
             <RefreshCw className="w-8 h-8 text-[#7C3AED] animate-spin" />

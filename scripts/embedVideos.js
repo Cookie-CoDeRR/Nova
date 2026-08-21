@@ -63,11 +63,10 @@ async function main() {
     process.exit(0);
   }
 
-  console.log(`Starting embeddings generation for ${videos.length} videos...`);
   const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
   const vectors = [];
 
-  // Check if we already have some vectors to avoid rebuilding them all (optional checkpointing)
+  // Load existing vectors to skip duplicates
   let existingVectorsMap = new Map();
   if (fs.existsSync(outputPath)) {
     try {
@@ -75,83 +74,106 @@ async function main() {
       existing.forEach(v => {
         if (v.videoId && Array.isArray(v.embedding)) {
           existingVectorsMap.set(v.videoId, v.embedding);
+          vectors.push(v); // Keep existing vectors
         }
       });
-      console.log(`Found ${existingVectorsMap.size} existing vectors. Will skip embedding these.`);
+      console.log(`Loaded ${existingVectorsMap.size} existing vectors.`);
     } catch (e) {
       console.log('Failed to parse existing vectors file, will rebuild all.');
     }
   }
 
-  for (let i = 0; i < videos.length; i++) {
-    const video = videos[i];
-    
-    // Check if vector already exists to save quota and speed up runs
-    if (existingVectorsMap.has(video.videoId)) {
-      vectors.push({
-        videoId: video.videoId,
-        embedding: existingVectorsMap.get(video.videoId)
-      });
-      continue;
-    }
+  // Filter videos that need embedding
+  const pendingVideos = videos.filter(v => !existingVectorsMap.has(v.videoId));
+  console.log(`Found ${pendingVideos.length} videos needing embeddings.`);
 
-    const textToEmbed = `${video.title || ''}\n\n${video.description || ''}`.trim();
-    if (!textToEmbed) {
-      console.warn(`Warning: Video ${video.videoId} has no title or description. Skipping embedding.`);
-      continue;
-    }
+  if (pendingVideos.length === 0) {
+    console.log('All videos are already embedded. Saving current database...');
+    // Ensure file exists just in case
+    fs.writeFileSync(outputPath, JSON.stringify(vectors, null, 2), 'utf8');
+    console.log('Database is up to date.');
+    process.exit(0);
+  }
 
-    console.log(`[${i + 1}/${videos.length}] Embedding: ${video.title.substring(0, 50)}...`);
+  const BATCH_SIZE = 50;
+  console.log(`Starting batch embeddings generation (Batch Size: ${BATCH_SIZE})...`);
+
+  for (let i = 0; i < pendingVideos.length; i += BATCH_SIZE) {
+    const batch = pendingVideos.slice(i, i + BATCH_SIZE);
+    console.log(`\nProcessing batch [${Math.floor(i / BATCH_SIZE) + 1}/${Math.ceil(pendingVideos.length / BATCH_SIZE)}] (${batch.length} videos)...`);
+
+    const batchTexts = batch.map(video => {
+      return `${video.title || ''}\n\n${video.description || ''}`.trim() || 'No title';
+    });
 
     try {
       const res = await ai.models.embedContent({
-        model: 'text-embedding-004',
-        contents: textToEmbed
+        model: 'gemini-embedding-2',
+        contents: batchTexts
       });
 
-      const values = res.embedding?.values;
-      if (values && Array.isArray(values)) {
-        vectors.push({
-          videoId: video.videoId,
-          embedding: values
+      const embeddings = res.embeddings;
+      if (embeddings && Array.isArray(embeddings)) {
+        embeddings.forEach((emb, index) => {
+          const video = batch[index];
+          if (emb && Array.isArray(emb.values)) {
+            vectors.push({
+              videoId: video.videoId,
+              embedding: emb.values
+            });
+          } else {
+            console.error(`Failed to extract values for index ${index} (${video.title})`);
+          }
         });
+        console.log(`Successfully embedded batch of ${batch.length} videos.`);
       } else {
-        console.error(`Failed to extract embedding values for video ${video.videoId}`);
+        console.error('Failed to get embeddings array in response structure:', JSON.stringify(res));
       }
     } catch (err) {
-      console.error(`Failed to embed video ${video.videoId}: ${err.message}`);
-      // Sleep a bit and retry once
-      console.log('Retrying in 2 seconds...');
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      console.error(`Batch processing failed: ${err.message}`);
+      console.log('Retrying batch in 5 seconds...');
+      await new Promise(resolve => setTimeout(resolve, 5000));
+      
       try {
         const res = await ai.models.embedContent({
-          model: 'text-embedding-004',
-          contents: textToEmbed
+          model: 'gemini-embedding-2',
+          contents: batchTexts
         });
-        const values = res.embedding?.values;
-        if (values && Array.isArray(values)) {
-          vectors.push({
-            videoId: video.videoId,
-            embedding: values
+        const embeddings = res.embeddings;
+        if (embeddings && Array.isArray(embeddings)) {
+          embeddings.forEach((emb, index) => {
+            const video = batch[index];
+            if (emb && Array.isArray(emb.values)) {
+              vectors.push({
+                videoId: video.videoId,
+                embedding: emb.values
+              });
+            }
           });
+          console.log(`Successfully embedded batch on retry.`);
         }
       } catch (retryErr) {
-        console.error(`Retry failed: ${retryErr.message}. Skipping this video.`);
+        console.error(`Retry failed: ${retryErr.message}. Skipping this batch.`);
       }
     }
 
-    // Small rate-limit delay
-    await new Promise(resolve => setTimeout(resolve, 150));
+    // Save vectors database checkpoint after each batch
+    try {
+      const outputDir = path.dirname(outputPath);
+      if (!fs.existsSync(outputDir)) {
+        fs.mkdirSync(outputDir, { recursive: true });
+      }
+      fs.writeFileSync(outputPath, JSON.stringify(vectors, null, 2), 'utf8');
+      console.log(`Saved checkpoint: ${vectors.length} total vectors stored.`);
+    } catch (saveErr) {
+      console.error(`Failed to save checkpoint: ${saveErr.message}`);
+    }
+
+    // Rate-limit throttle (3 seconds sleep between batches to avoid 429)
+    await new Promise(resolve => setTimeout(resolve, 3000));
   }
 
-  // Ensure target folder exists
-  const outputDir = path.dirname(outputPath);
-  if (!fs.existsSync(outputDir)) {
-    fs.mkdirSync(outputDir, { recursive: true });
-  }
-
-  fs.writeFileSync(outputPath, JSON.stringify(vectors, null, 2), 'utf8');
-  console.log(`\nSuccess! Saved ${vectors.length} vectors to ${outputPath}.`);
+  console.log(`\nSuccess! Vector database now contains ${vectors.length} video records.`);
 }
 
 main().catch(err => {
